@@ -1,64 +1,122 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 
 
-  public class UserService
+public class UserService
   {
+private readonly AppDBContext _appDbContext;
+public UserService(AppDBContext appDbContext){
+  _appDbContext=appDbContext;
+}      
 
-    private static List<UserDto> _users = new List<UserDto>();
-      
-
-    public List<UserDto> GetAllUsersService()
+    public async Task<List<User>> GetAllUsersService()
     {
-      return _users;
-    }
-    public UserDto? GetUserByIdService(Guid id)
-    {
-      var foundUser = _users.Find(user => user.UserId == id);
-      return foundUser;
-    }
-
-    public UserDto? CreateUserService(CreateUserDto newUser)
-    {
-      // name, email, password
-      // user = id, name, email, password, createdAt
-      var user = new UserDto {
-        UserId = Guid.NewGuid(),
-        Name = newUser.Name,
-        Email = newUser.Email,
-        Password = newUser.Password
-      };
-      if(user == null){
-        return null;
-      }
-      _users.Add(user);
-      return user;
-    }
-
-    public bool DeleteUserByIdService(Guid id)
-    {
-      var userToRemove = _users.FirstOrDefault(u => u.UserId == id);
-      if (userToRemove != null)
+      try
       {
-        _users.Remove(userToRemove);
-        return true;
+        var user= await _appDbContext.Users.ToListAsync();
+      return user;
       }
-      return false;
+      catch (System.Exception)
+      {
+        
+        throw new ApplicationException("erorr ocurred when get the data from the user table");
+      }
     }
-    public async Task<UserDto?> UpdateUserService(Guid Id, UserDto UpdateUser)
-  {
-    var existingUser = _users.FirstOrDefault(u => u.UserId == Id);
-    if (existingUser != null)
+    public async Task<User> CreateUserService(CreateUserDto newuser)
     {
-  
-      existingUser.Name = UpdateUser.Name ?? existingUser.Name;
-     existingUser.Email = UpdateUser.Email ?? existingUser.Email;
-      existingUser.Password= UpdateUser.Password ?? existingUser.Password;
-      
+      try
+      {
+        var user = new User {
+          Name=newuser.Name,
+          Email = newuser.Email,
+         Password = newuser.Password};
+         await _appDbContext.Users.AddAsync(user);
+         await _appDbContext.SaveChangesAsync();
+         return user;
+      }
+      catch (System.Exception)
+      {
+        
+        throw new ApplicationException("erorr ocurred when creat the  user ");
+      }
     }
-     return await Task.FromResult(existingUser);
-  }
+
+    public async Task<UserDto?> GetUserByIdService(Guid userId)
+{
+    try
+    {
+        var user = await _appDbContext.Users
+            .FirstOrDefaultAsync(u => u.UserId == userId);
+
+        if (user == null)
+        {
+            return null; // Return null if user not found
+        }
+
+        // Convert User to UserDto if needed
+        var userDto = new UserDto
+        {
+            UserId = user.UserId,
+            Name = user.Name,
+            Email = user.Email,
+            // Map other properties as needed
+        };
+
+        return userDto;
+    }
+    catch (Exception)
+    {
+        throw new ApplicationException("Error occurred while retrieving the user.");
+    }
+}
+   public async Task<bool> DeleteUserByIdService(Guid id)
+{
+    try
+    {
+        var userToRemove = await _appDbContext.Users.FirstOrDefaultAsync(u => u.UserId == id);
+
+        if (userToRemove != null)
+        {
+            _appDbContext.Users.Remove(userToRemove);
+            await _appDbContext.SaveChangesAsync();
+            return true; 
+        }
+        return false; 
+    }
+    catch (Exception)
+    {
+        throw new ApplicationException("Error occurred while deleting the user.");
+    }
+}
+
+    public async Task<User> UpdateUserService(Guid id, UpdateUser updateUser)
+{
+    try
+    {
+        var existingUser = await _appDbContext.Users.FindAsync(id);
+
+        if (existingUser == null)
+        {
+            throw new ApplicationException("User not found.");
+        }
+
+        existingUser.Name = updateUser.Name ?? existingUser.Name;
+        existingUser.Email = updateUser.Email ?? existingUser.Email;
+        existingUser.Password = updateUser.Password ?? existingUser.Password;
+
+        _appDbContext.Users.Update(existingUser);
+        await _appDbContext.SaveChangesAsync();
+
+        return existingUser;
+    }
+    catch (System.Exception)
+    {
+        throw new ApplicationException("Error occurred when updating the user.");
+    }
+}
     }

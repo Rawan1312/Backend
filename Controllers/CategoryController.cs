@@ -8,97 +8,122 @@ using Microsoft.AspNetCore.Mvc;
 [Route("/api/v1/users")]
 public class CategoryController : ControllerBase
 {
-  private readonly CategoryService _categoryService;
-    public CategoryController()
+  private readonly CategoryService _categoryservice;
+    public CategoryController(CategoryService categoryservice)
     {
-        _categoryService = new CategoryService();
+        _categoryservice = categoryservice;
     }
 [HttpGet]
-    public IActionResult GetAllCategory()
+    public async Task<IActionResult> GetAllCategory()
     {
-        var category = _categoryService.GetAllCategoryService();
-        return Ok(category);
-    }
-    [HttpGet("{categoryId}")]
-    public IActionResult GetSingleCategoryById(string categoryId)
-    {
-        if (!Guid.TryParse(categoryId, out Guid categoryIdGuid))
+        try
         {
-            return BadRequest("Invalid user ID Format");
+            var category = await _categoryservice.GetAllCategoryService();
+            var response=new{Message="return all the gategory",Category=category};
+        return Ok(response);
         }
+        catch (ApplicationException ex)
+        {
+            
+            return StatusCode(500, ex.Message);
+        }
+        catch (Exception ex){
+            
+            return StatusCode(500, ex.Message);
+        }}
 
-        var category = _categoryService.GetCategoryByIdService(categoryIdGuid);
-
+    [HttpGet("{categoryId}")]
+public async Task<IActionResult> GetCategoryById(Guid categoryId)
+{
+    try
+    {
+        var category = await _categoryservice.GetCategoryByIdService(categoryId);
+        
         if (category == null)
         {
-            return NotFound($"User with {categoryId} does not exist");
+            return NotFound(new { Message = "cayegory not found" });
         }
+        
         return Ok(category);
     }
-
-
-    [HttpDelete("{categoryId}")]
-    public IActionResult DeleteCategoryByIdService(string categoryId)
+    catch (ApplicationException ex)
     {
-        if (!Guid.TryParse(categoryId, out Guid categoryIdGuid))
-        {
-            return BadRequest("Invalid category ID Format");
-        }
-
-        bool result = _categoryService.DeleteCategoryByIdService(categoryIdGuid);
-
-        if (!result)
-        {
-            return NotFound($"User with {categoryId} does not exist");
-        }
-        return NoContent();
+        return StatusCode(500, ex.Message);
     }
+    catch (Exception ex)
+    {
+        return StatusCode(500, ex.Message);
+    }
+}
+
+    [HttpDelete("{id}")]
+public async Task<IActionResult> DeleteCategory(Guid id)
+{
+    try
+    {
+        var result = await _categoryservice.DeleteCategoryByIdService(id);
+        if (result)
+        {
+            return Ok(new { Message = "category deleted successfully" });
+        }
+        else
+        {
+            return NotFound(new { Message = "category not found" });
+        }}
+    catch (ApplicationException ex)
+    {
+        return StatusCode(500, ex.Message);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, ex.Message);
+    }}
 
 
      [HttpPost]
-    public IActionResult CreateCategory(CreateCategoryDto newcatogery)
+    public async Task<IActionResult> CreatCategory([FromBody]CreateCategoryDto newcategory)
     {
-          if (!CategoryValidation.isValidName(newcatogery.Name)) // "test"
-    {
-      return BadRequest("Name can not be empty");
-    }
-           var category = _categoryService.CreateCategoryService(newcatogery);
-
-
-        if (category == null)
+        try
         {
-            return NotFound($"Category could not be created");
+            var category = await _categoryservice.CreateCategoryService(newcategory);
+            var response=new{Message="creat the users",Category=category};
+        return Created($"/api/category/{category.CategoryId}",response);
         }
-        return Created("created category", category);
-    }
+        catch (ApplicationException ex)
+        {
+            
+            return StatusCode(500, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }}
 [HttpPut("{id}")]
-  public IActionResult UpdateCategory(string id, CategoryDto updateCategory)
+public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] CategoryDto updatecategory)
 {
-    if (!Guid.TryParse( id, out Guid categoryId))
+    try
     {
-        return BadRequest("Invalid product ID Format");
+        if (updatecategory == null)
+        {
+            return BadRequest("Invalid user data.");}
+
+        var updatedcategory = await _categoryservice.UpdateCategoryService(id, updatecategory);
+        
+        if (updatedcategory == null)
+        {
+            return NotFound("category not found.");
+        }
+
+        var response = new { Message = "category updated successfully", Category= updatedcategory };
+        return Ok(response);
     }
-
-    var category = _categoryService.GetCategoryByIdService(categoryId);
-
-    if (category == null)
+    catch (ApplicationException ex)
     {
-        return NotFound($"category with {id} not found");
+        return StatusCode(500, ex.Message);
     }
-
-    if (updateCategory.Name != null && !CategoryValidation.isValidName(updateCategory.Name))
+    catch (Exception ex)
     {
-        return BadRequest("Name cannot be empty");
+        return StatusCode(500, ex.Message);
     }
-
-    // if (updateProduct.Price && !ProductValidation.isValidPrice(updateProduct.Price))
-    // {
-    //     return BadRequest("Price cannot be negative");
-    // }
-
-  
-    _categoryService.UpdateUserService( categoryId, updateCategory);
-
-    return NoContent(); 
-}
+}  
 }

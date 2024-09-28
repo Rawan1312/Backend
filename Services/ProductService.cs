@@ -2,140 +2,178 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 
 public interface IProductService{
-    List<ProductDto> GetProductsService();
-    Product CreateProductService(CreateProductDto createProduct);
-    bool DeleteProductByIdService(Guid id);
-    ProductDto? GetProductByIdService(Guid id);
-    Task<Product?> UpdateProductService(Guid Id, UpdateProductDto UpdateProductDto);
+    Task<List<ProductDto>> GetProductsService();
+    Task<ProductDto?> GetProductByIdService(Guid Id);
+    Task<bool> DeleteProductByIdService(Guid id);
+    Task<Product> CreateProductService(CreateProductDto newproduct);
+     Task<Product> UpdateProductService(Guid id, UpdateProductDto updateProduct);
     
     
 } 
-public class ProductService: IProductService
+public class ProductService:IProductService
 {
-    private static readonly List<Product> _products = new List<Product>();
+    private readonly AppDBContext _appDbContext;
+public ProductService(AppDBContext appDbContext){
+  _appDbContext=appDbContext;
+}
     
-    public class PaginatedResult<T>
+//     public class PaginatedResult<T>
+// {
+//     // = new List<Item>();تاكدي بعدين هل يوضع لها ؟ او 
+//     public List<T>? Items { get; set; }
+//     public int TotalCount { get; set; }
+//     public int PageNumber { get; set; }
+//     public int PageSize { get; set; }
+//         public string? SearchBy { get; set; }
+
+//         public async Task<PaginatedResult<ProductDto>> GetProductsService(int pageNumber, int pageSize, string? searchBy = null)
+//     {
+//         var products = await _appDbContext.Products.ToListAsync();
+
+//         var filteredProducts = products.Where(p =>
+//             string.IsNullOrEmpty(searchBy) || p.Name.Contains(searchBy, StringComparison.OrdinalIgnoreCase));
+
+//         var totalFilteredProducts = filteredProducts.Count();
+
+   
+//     var paginatedProducts = filteredProducts.Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(product => new ProductDto
+//         {
+//             Id = product.Id,
+//             Name = product.Name,
+//             Price = product.Price
+//         }).ToList();
+
+   
+//     var paginatedResult = new PaginatedResult<ProductDto>
+//         {
+//             PageSize = pageSize,
+//             PageNumber = pageNumber,
+//             SearchBy = searchBy,
+//             TotalCount = totalFilteredProducts,
+//             Items = paginatedProducts
+//         };
+
+//     return paginatedResult;}}
+
+    public async Task<List<ProductDto>> GetProductsService()
 {
-    // = new List<Item>();تاكدي بعدين هل يوضع لها ؟ او 
-    public List<T>? Items { get; set; }
-    public int TotalCount { get; set; }
-    public int PageNumber { get; set; }
-    public int PageSize { get; set; }
-        public string? SearchBy { get; set; }
-
-        public PaginatedResult<ProductDto> GetProductsService(int pageNumber, int pageSize, string? searchBy = null)
+    try
     {
-        // products => Id, Name, Price, Description, CreatedAt 
-        // ProductDto => Id, Name, Price
-
-
-        var filterProducts = _products.Where(p => 
-        string.IsNullOrEmpty(searchBy) || p.Name.Contains(searchBy, StringComparison.OrdinalIgnoreCase));
-
-
-        var totalFilteredProducts = filterProducts.Count();
-
-   
-    var products = filterProducts.Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(product => new ProductDto
-    {
-        Id = product.Id,
-        Name = product.Name,
-        Price = product.Price
-    }).ToList();
-
-   
-    var paginatedResult = new PaginatedResult<ProductDto>
-    {
-        PageSize = pageSize,
-        PageNumber = pageNumber,
-        SearchBy = searchBy,
-        TotalCount = totalFilteredProducts,  
-        Items = products
-    };
-
-    return paginatedResult;}}
-
-    public List<ProductDto> GetProductsService()
-    {
-        // products => Id, Name, Price, Description, CreatedAt 
-        // ProductDto => Id, Name, Price
-        var products = _products.Select(product => new ProductDto
+        var products = await _appDbContext.Product.ToListAsync();
+        
+        var productDtos = products.Select(p => new ProductDto
         {
-            Id = product.Id,
-            Name = product.Name,
-            Price = product.Price
+            Id = p.Id, 
+            Name = p.Name,
+            Price = p.Price,
         }).ToList();
 
-        return products;
+        return productDtos;
     }
-
-    public Product CreateProductService(CreateProductDto createProduct)
+    catch (System.Exception)
     {
-        var product = new Product
-        {
-            Id = Guid.NewGuid(),
-            Name = createProduct.Name,
-            Price = createProduct.Price,
-            CreatedAt = DateTime.Now,
-        };
-        _products.Add(product);
-        return product;
+        throw new ApplicationException("Error occurred when getting data from the product table");
     }
-
-    public bool DeleteProductByIdService(Guid id)
+}
+public async Task<ProductDto?> GetProductByIdService(Guid Id)
+{
+    try
     {
-        // Find the product 
-        var product = _products.FirstOrDefault(product => product.Id == id);
+        var product = await _appDbContext.Product
+            .FirstOrDefaultAsync(u => u.Id == Id);
 
         if (product == null)
         {
-            return false;
+            return null; // Return null if product not found
         }
 
-        _products.Remove(product);
-        return true;
-    }
-
-
-    public ProductDto? GetProductByIdService(Guid id)
-    {
-        var product = _products.FirstOrDefault(product => product.Id == id);
-
-        if (product == null)
-        {
-            return null;
-        }
-
-        // create the return dto 
-        var productData = new ProductDto
+        // Convert product to productDto if needed
+        var productDto = new ProductDto
         {
             Id = product.Id,
             Name = product.Name,
-            Price = product.Price
+            Price = product.Price,
+            // Map other properties as needed
         };
 
-        return productData;
-
+        return productDto;
     }
-
-    public async Task<Product?> UpdateProductService(Guid Id, UpdateProductDto UpdateProductDto)
-  {
-    var existingProduct = _products.FirstOrDefault(u => u.Id == Id);
-    if (existingProduct != null)
+    catch (Exception)
     {
-        // check if update product has name value or not, if yes, then get the value of update productdto
-        // if not, get existing product nam
-      existingProduct.Name = UpdateProductDto.Name ?? existingProduct.Name;
-     existingProduct.Price = UpdateProductDto.Price ?? existingProduct.Price;
-      
-      
+        throw new ApplicationException("Error occurred while retrieving the product.");
     }
-     return await Task.FromResult(existingProduct);
-  }
 }
+
+public async Task<bool> DeleteProductByIdService(Guid id)
+{
+    try
+    {
+        var productToRemove = await _appDbContext.Product.FirstOrDefaultAsync(u => u.Id == id);
+
+        if (productToRemove != null)
+        {
+            _appDbContext.Product.Remove(productToRemove);
+            await _appDbContext.SaveChangesAsync();
+            return true; 
+        }
+        return false; 
+    }
+    catch (Exception)
+    {
+        throw new ApplicationException("Error occurred while deleting the product.");
+    }
+}
+
+public async Task<Product> CreateProductService(CreateProductDto newproduct)
+    {
+      try
+      {
+        var product = new Product {
+          Name=newproduct.Name,
+          Price = newproduct.Price,};
+         await _appDbContext.Product.AddAsync(product);
+         await _appDbContext.SaveChangesAsync();
+         return product;
+      }
+      catch (System.Exception)
+      {
+        
+        throw new ApplicationException("erorr ocurred when creat the  product ");
+      }
+    }
+   public async Task<Product> UpdateProductService(Guid id, UpdateProductDto updateProduct)
+{
+    try
+    {
+        var existingProduct = await _appDbContext.Product.FindAsync(id);
+
+        if (existingProduct == null)
+        {
+            throw new ApplicationException("Product not found.");
+        }
+
+        existingProduct.Name = updateProduct.Name ?? existingProduct.Name;
+        existingProduct.Price = updateProduct.Price ?? existingProduct.Price;
+        
+
+        _appDbContext.Product.Update(existingProduct);
+        await _appDbContext.SaveChangesAsync();
+
+        return existingProduct;
+    }
+    catch (System.Exception)
+    {
+        throw new ApplicationException("Error occurred when updating the user.");
+    }
+}
+
+
+}
+
 // need to check which properites that user wanna update 
 // in case user only update FirstName, then we will take the update value of FirstName from user 
 // and the others will be the same
