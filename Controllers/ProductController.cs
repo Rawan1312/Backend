@@ -17,116 +17,117 @@ public class ProductController : ControllerBase
 
   //? GET => /api/products => Get all the products
   [HttpGet]
-  public IActionResult GetProducts()
+  public async Task<IActionResult> GetAllProducts()
   {
-    var products = _productService.GetProductsService();
-    return Ok(products);
-  }
+    try
+        {
+            var product =await _productService.GetProductsService();
+            var response=new{Message="return all the product",Product=product};
+        return Ok(response);
+        }
+        catch (ApplicationException ex)
+        {
+            
+            return StatusCode(500, ex.Message);
+        }
+        catch (Exception ex){
+            
+            return StatusCode(500, ex.Message);
+  }}
 
   //? GET => /api/products/{id} => Get a single product by Id
-  [HttpGet("{id:guid}")]
-  public IActionResult GetProductById(Guid id)
-  {
-    // Find the product 
-    var product = _productService.GetProductByIdService(id);
-    if (product == null)
+  [HttpGet("{ProId}")]
+public async Task<IActionResult> GetProductById(Guid ProId)
+{
+    try
     {
-      return NotFound($"Product with this {id} does not exist");
-    }
-    return Ok(product);
-  }
+        var pro =await _productService.GetProductByIdService(ProId); 
 
+        if (pro == null)
+        {
+            return NotFound(new { Message = "product not found" });
+        }
+
+        return Ok(pro);
+    }
+    catch (ApplicationException ex)
+    {
+        return StatusCode(500, ex.Message);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, ex.Message);
+    }
+}
 
   // //? Delete => /api/products/{id} => delete a single product by Id
   [HttpDelete("{id}")]
-  public IActionResult DeleteProductById(Guid id)
-  {
-    var result = _productService.DeleteProductByIdService(id);
-    if (!result)
+public async Task<IActionResult> DeleteProduct(Guid id)
+{
+    try
     {
-      return NotFound($"Product with this {id} does not exist");
+        var result = await _productService.DeleteProductByIdService(id);
+        if (result)
+        {
+            return Ok(new { Message = "product deleted successfully" });
+        }
+        else
+        {
+            return NotFound(new { Message = "product not found" });
+        }}
+    catch (ApplicationException ex)
+    {
+        return StatusCode(500, ex.Message);
     }
-    return NoContent();
-  }
+    catch (Exception ex)
+    {
+        return StatusCode(500, ex.Message);
+    }}
 
   [HttpPost]
-  public IActionResult CreateProduct(CreateProductDto newProduct)
-  {
-    if (!ProductValidation.isValidName(newProduct.Name)) // "test"
+    public async Task<IActionResult> CreatUsers([FromBody]CreateProductDto newproduct)
     {
-      return BadRequest("Name can not be empty");
-    }
-    if (!ProductValidation.isValidPrice(newProduct.Price))
-    {
-      return BadRequest("Price can not be negative");
-    }
-    var product = _productService.CreateProductService(newProduct);
-    return Created($"/api/products/{product.Id}", product);
-  }
+        try
+        {
+            var product = await _productService.CreateProductService(newproduct);
+            var response=new{Message="creat the users",Product=product};
+        return Created($"/api/product/{product.Id}",response);
+        }
+        catch (ApplicationException ex)
+        {
+            
+            return StatusCode(500, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }}
 
-  [HttpPut("{id}")]
-  public IActionResult UpdateProduct(string id, UpdateProductDto updateProduct)
+[HttpPut("{id}")]
+public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductDto updateProduct)
 {
-    // تحقق من صحة معرف المنتج
-    if (!Guid.TryParse( id, out Guid productId))
+    try
     {
-        return BadRequest("Invalid product ID Format");
+        if (updateProduct == null)
+        {
+            return BadRequest("Invalid product data.");}
+
+        var updatedProduct = await _productService.UpdateProductService(id, updateProduct);
+        
+        if (updatedProduct == null)
+        {
+            return NotFound("product not found.");
+        }
+
+        var response = new { Message = "Product updated successfully", Product = updatedProduct };
+        return Ok(response);
     }
-
-    // ابحث عن المنتج باستخدام المعرف
-    var product = _productService.GetProductByIdService(productId);
-
-    if (product == null)
+    catch (ApplicationException ex)
     {
-        return NotFound($"Product with {id} not found");
+        return StatusCode(500, ex.Message);
     }
-
-    // تحقق من صحة اسم المنتج إذا تم توفيره
-    if (updateProduct.Name != null && !ProductValidation.isValidName(updateProduct.Name))
+    catch (Exception ex)
     {
-        return BadRequest("Name cannot be empty");
-    }
-
-    // if (updateProduct.Price && !ProductValidation.isValidPrice(updateProduct.Price))
-    // {
-    //     return BadRequest("Price cannot be negative");
-    // }
-
-  
-    _productService.UpdateProductService( productId, updateProduct);
-
-    return NoContent(); 
-}
-  // public IActionResult UpdateProduct(Guid id, UpdateProductDto updateProduct)
-  // {
-  //   // Find the product 
-  //   var product = _productService.UpdateProductDto(product => product.Id == id);
-
-  //   if (product == null)
-  //   {
-  //     return NotFound($"Product with {id} not found");
-  //   }
-
-  //   if (updateProduct.Name != null)
-  //   {
-
-  //     if (!ProductValidation.isValidName(updateProduct.Name)) // "test"
-  //     {
-  //       return BadRequest("Name can not be empty");
-  //     }
-  //   }
-
-  //   if (!ProductValidation.isValidPrice(updateProduct.Price))
-  //   {
-  //     return BadRequest("Price can not be negative");
-  //   }
-
-
-  //   product.Name = updateProduct.Name ?? product.Name;
-  //   product.Price = updateProduct.Price;
-  //   product.Description = updateProduct.Description ?? product.Description;
-
-  //   return NoContent();
-  // }
-
+        return StatusCode(500, ex.Message);
+    }}
 }

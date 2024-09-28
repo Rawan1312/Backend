@@ -1,4 +1,4 @@
-public class CategoryDto
+public record CategoryDto
 {
   public Guid CategoryId { get; set; }
   public required string Name { get; set; }

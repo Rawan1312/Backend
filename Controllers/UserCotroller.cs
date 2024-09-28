@@ -9,97 +9,119 @@ using Microsoft.AspNetCore.Mvc;
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
-    public UserController()
+    public UserController(UserService userService)
     {
-        _userService = new UserService();
+        _userService = userService;
     }
 
     [HttpGet]
-    public IActionResult GetAllUsers()
+    public async Task<IActionResult> GetAllUsers()
     {
-        var users = _userService.GetAllUsersService();
-        return Ok(users);
-    }
-
-    [HttpGet("{userId}")]
-    public IActionResult GetSingleUserById(string userId)
-    {
-        if (!Guid.TryParse(userId, out Guid userIdGuid))
+        try
         {
-            return BadRequest("Invalid user ID Format");
+            var users = await _userService.GetAllUsersService();
+            var response=new{Message="return all the users",Users=users};
+        return Ok(response);
         }
+        catch (ApplicationException ex)
+        {
+            
+            return StatusCode(500, ex.Message);
+        }
+        catch (Exception ex){
+            
+            return StatusCode(500, ex.Message);
+        }}
 
-        var user = _userService.GetUserByIdService(userIdGuid);
-
+[HttpGet("{userId}")]
+public async Task<IActionResult> GetUserById(Guid userId)
+{
+    try
+    {
+        var user = await _userService.GetUserByIdService(userId);
+        
         if (user == null)
         {
-            return NotFound($"User with {userId} does not exist");
+            return NotFound(new { Message = "User not found" });
         }
+        
         return Ok(user);
     }
-
-    [HttpDelete("{userId}")]
-    public IActionResult DeleteUserById(string userId)
+    catch (ApplicationException ex)
     {
-        if (!Guid.TryParse(userId, out Guid userIdGuid))
-        {
-            return BadRequest("Invalid user ID Format");
-        }
-
-        bool result = _userService.DeleteUserByIdService(userIdGuid);
-
-        if (!result)
-        {
-            return NotFound($"User with {userId} does not exist");
-        }
-        return NoContent();
+        return StatusCode(500, ex.Message);
     }
-
-
-     [HttpPost]
-    public IActionResult CreateUser(CreateUserDto newUser)
-    {if (!UserValidation.isValidName(newUser.Name)) // "test"
+    catch (Exception ex)
     {
-      return BadRequest("Name can not be empty");
+        return StatusCode(500, ex.Message);
     }
-    if (!UserValidation.IsValidEmail(newUser.Email)) // "test"
-    {
-      return BadRequest("you have erro in email 'empty or not Contain @'");
-    }
-           var user = _userService.CreateUserService(newUser);
-
-        // bool result = _userService.DeleteUserByIdService(userIdGuid);
-
-        if (user == null)
-        {
-            return NotFound($"User could not be created");
-        }
-        return Created("created user", user);
-    }
-[HttpPut("{id}")]
-  public IActionResult UpdateUser(string id, UserDto updateUser)
-{
-    if (!Guid.TryParse( id, out Guid UserId))
-    {
-        return BadRequest("Invalid product ID Format");
-    }
-
-    var user = _userService.GetUserByIdService(UserId);
-
-    if (user == null)
-    {
-        return NotFound($"user with {id} not found");
-    }
-
-    if (updateUser.Name != null && !UserValidation.isValidName(updateUser.Name))
-    {
-        return BadRequest("Name cannot be empty");
-    }
-
-
-  
-    _userService.UpdateUserService( UserId, updateUser);
-
-    return NoContent(); 
 }
+[HttpDelete("{id}")]
+public async Task<IActionResult> DeleteUser(Guid id)
+{
+    try
+    {
+        var result = await _userService.DeleteUserByIdService(id);
+        if (result)
+        {
+            return Ok(new { Message = "User deleted successfully" });
+        }
+        else
+        {
+            return NotFound(new { Message = "User not found" });
+        }}
+    catch (ApplicationException ex)
+    {
+        return StatusCode(500, ex.Message);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, ex.Message);
+    }}
+[HttpPost]
+    public async Task<IActionResult> CreatUsers([FromBody]CreateUserDto newuser)
+    {
+        try
+        {
+            var user = await _userService.CreateUserService(newuser);
+            var response=new{Message="creat the users",Users=user};
+        return Created($"/api/users/{user.UserId}",response);
+        }
+        catch (ApplicationException ex)
+        {
+            
+            return StatusCode(500, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }}
+[HttpPut("{id}")]
+public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUser updateUser)
+{
+    try
+    {
+        if (updateUser == null)
+        {
+            return BadRequest("Invalid user data.");}
+
+        var updatedUser = await _userService.UpdateUserService(id, updateUser);
+        
+        if (updatedUser == null)
+        {
+            return NotFound("User not found.");
+        }
+
+        var response = new { Message = "User updated successfully", User = updatedUser };
+        return Ok(response);
+    }
+    catch (ApplicationException ex)
+    {
+        return StatusCode(500, ex.Message);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, ex.Message);
+    }
+}  
 }
