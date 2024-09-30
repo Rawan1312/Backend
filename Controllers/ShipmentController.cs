@@ -97,15 +97,15 @@ public async Task<IActionResult> DeleteShipment(Guid ShipmentId)
             return StatusCode(500, ex.Message);
         }}
 [HttpPut("{ShipmentId}")]
-public async Task<IActionResult> UpdateShipment(Guid id, [FromBody] UpdateShipment updateShipment)
+public async Task<IActionResult> UpdateShipment(Guid id, [FromBody] UpdateShipment updateShip)
 {
     try
     {
-        if (updateShipment == null)
+        if (updateShip == null)
        {
           return BadRequest("Invalid shipment data.");}
 
-        var updateShipment = await _shipmentService.UpdateShipmentService(id, updateShipment);
+        var updateShipment = await _shipmentService.UpdateShipmentService(id, updateShip);
         
         if (updateShipment == null)
         {

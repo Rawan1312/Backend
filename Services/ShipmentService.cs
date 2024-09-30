@@ -14,7 +14,7 @@ public ShipmentService(AppDBContext appDbContext){
   _appDbContext=appDbContext;
 }      
 
-    public async Task<List<ShipmentDto>> GetAllShipmentService()
+    public async Task<List<Shipment>> GetAllShipmentService()
     {
       try
       {
@@ -27,11 +27,11 @@ public ShipmentService(AppDBContext appDbContext){
         throw new ApplicationException("erorr ocurred when get the data from the shipment table");
       }
     }
-    public async Task<ShipmentDto> CreateShipmentService(CreateShipment newshipment)
+    public async Task<Shipment> CreateShipmentService(CreateShipment newshipment)
     {
       try
       {
-        var shipment = new ShipmentDto {
+        var shipment = new Shipment {
           ShipmentDate = newshipment.shipmentDate };
          await _appDbContext.Shipment.AddAsync(shipment);
          await _appDbContext.SaveChangesAsync();
@@ -91,7 +91,7 @@ public ShipmentService(AppDBContext appDbContext){
     }
 }
 
-    public async Task<ShipmentDto> UpdateShipmentService(Guid id, UpdateShipment updateShipment)
+    public async Task<Shipment> UpdateShipmentService(Guid id, UpdateShipment updateShipment)
 {
     try
     {

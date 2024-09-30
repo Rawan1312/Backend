@@ -52,14 +52,14 @@ public AddressService(AppDBContext appDbContext){
     {
         throw new ApplicationException("Error occurred while retrieving the address.");
     }}
-    public async Task<AddressDto> CreateAddressService(CreateAddressDto newAddress)
+    public async Task<Address> CreateAddressService(AddressDto newAddress)
     {
       try{
-        var address = new AddressDto
+        var address = new Address
         {
-       AddressId = Guid.NewGuid(),
+       AddressId = newAddress.AddressId,
         City = newAddress.City, 
-        State = newAddress.State // user must add city & state => its re
+        State = newAddress.State ,// user must add city & state => its re
         };
       //_Address.Add(address);
       await _appDbContext.Address.AddAsync(address);
@@ -89,7 +89,7 @@ public AddressService(AppDBContext appDbContext){
         throw new ApplicationException("Error occurred while deleting the address.");
     }
    } 
-    public async Task<AddressDto> UpdateAddressService(Guid id, AddressDto updateAddress)
+    public async Task<Address> UpdateAddressService(Guid id, AddressDto updateAddress)
 {
     try
     {

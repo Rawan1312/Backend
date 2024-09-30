@@ -84,7 +84,7 @@ public class AddressController : ControllerBase
 
 
      [HttpPost]
-    public async Task<IActionResult> CreateAddress(CreateAddressDto newaddress)
+    public async Task<IActionResult> CreateAddress(AddressDto newaddress)
     {
       try{
            var address = await _addressService.CreateAddressService(newaddress);
