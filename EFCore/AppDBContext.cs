@@ -1,19 +1,15 @@
 using Microsoft.EntityFrameworkCore;
-
 public class AppDBContext:DbContext{
 public AppDBContext(DbContextOptions<AppDBContext> options):base(options){}
 public DbSet<User> Users {get; set;}
 public DbSet<Product> Product {get; set;}
-<<<<<<< HEAD
 public DbSet<Category> Category {get; set;}
 public DbSet<Order> Orders{get;set;}
 public DbSet<OrderDetail> OrderDetails {get;set;}
 public DbSet<Payment> payments {get;set;}
-=======
-public DbSet<CategoryDto> Category {get; set;}
-
+public DbSet<CategoryDto> category {get; set;}
 public DbSet<AddressDto> Address {get; set;}
->>>>>>> 3bc7e84e52039266fb2880a5721fdfd6b50e970a
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity=>{
@@ -50,7 +46,7 @@ public DbSet<AddressDto> Address {get; set;}
           modelBuilder.Entity<OrderDetail>(entity=>{
           entity.HasKey(e=>e.OrderDetailId);
           entity.Property(e=>e.OrderDetailId).HasDefaultValueSql("uuid_generate_v4()");
-          entity.Property(e=>e.Total_Price).IsRequired().HasMaxLength(200);
+          entity.Property(e=>e.TotalPrice).IsRequired().HasMaxLength(200);
           entity.Property(e=>e.Quantity);
             });
           modelBuilder.Entity<Payment>(entity=>{
