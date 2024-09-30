@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 
 [ApiController]
-[Route("/api/v1/products")]
+[Route("/api/products")]
 
 public class ProductController : ControllerBase
 {
@@ -36,7 +36,7 @@ public class ProductController : ControllerBase
   }}
 
   //? GET => /api/products/{id} => Get a single product by Id
-  [HttpGet("{ProtId}")]
+  [HttpGet("{ProductId}")]
 public async Task<IActionResult> GetProductById(Guid ProId)
 {
     try
