@@ -6,6 +6,6 @@ public class User
         public required string Password { get; set; }
         public bool IsAdmin { get; set; } = false;
         public bool IsBanned { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     }
