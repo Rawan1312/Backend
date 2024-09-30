@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-// public interface ICategoryService{
-//     List<CategoryDto> GetAllCategoryService();
-//     CategoryDto? GetCategoryByIdService(Guid id);
-//     CategoryDto? CreateCategoryService(CreateCategoryDto newCategory);
-//     bool DeleteCategoryByIdService(Guid id);
-//     Task<CategoryDto?> UpdateUserService(Guid Id, CategoryDto UpdateCategoryDto);
-//     }
+public interface ICategoryService{
+    Task<List<Category>> GetAllCategoryService();
+    Task<CategoryDto?> GetCategoryByIdService(Guid categoryId);
+    Task<bool> DeleteCategoryByIdService(Guid id);
+    Task<Category> CreateCategoryService(CreateCategoryDto newcategory);
+    Task<Category> UpdateCategoryService(Guid id, CategoryDto UpdateCategoryDto);
+    }
 public class CategoryService
   {
 

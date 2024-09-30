@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 
-
+public interface IOrderService{
+    Task<List<Order>> GetAllOrderService();
+    Task<Order> CreateOrderService(CreateOrderDto newOrder);
+    Task<OrderDto?> GetOrderByIdService(Guid OrderId);
+    Task<bool> DeleteOrderByIdService(Guid id);
+    Task<Order> UpdateOrderService(Guid id, UpdateOrderDto updateOrder);
+}
 public class OrderService
   {
 private readonly AppDBContext _appDbContext;

@@ -8,8 +8,8 @@ public DbSet<Order> Orders{get;set;}
 public DbSet<OrderDetail> OrderDetails {get;set;}
 public DbSet<Payment> Payments {get;set;}
 public DbSet<CategoryDto> category {get; set;}
-public DbSet<AddressDto> Address {get; set;}
-
+public DbSet<Address> Address {get; set;}
+public DbSet<Payment> payments {get;set;}
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity=>{
@@ -57,7 +57,7 @@ public DbSet<AddressDto> Address {get; set;}
             });
           });
 
-           modelBuilder.Entity<AddressDto>(entity=>{
+           modelBuilder.Entity<Address>(entity=>{
           entity.HasKey(e=>e.AddressId);
           entity.Property(e=>e.AddressId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.City).IsRequired().HasMaxLength(100);

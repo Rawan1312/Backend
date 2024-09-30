@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/api/v1/users")]
+[Route("/api/users")]
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
@@ -78,6 +78,7 @@ public async Task<IActionResult> DeleteUser(Guid id)
     {
         return StatusCode(500, ex.Message);
     }}
+
 [HttpPost]
     public async Task<IActionResult> CreatUsers([FromBody]CreateUserDto newuser)
     {
