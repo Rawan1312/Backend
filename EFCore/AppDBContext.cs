@@ -7,9 +7,7 @@ public DbSet<Category> Category {get; set;}
 public DbSet<Order> Orders{get;set;}
 public DbSet<OrderDetail> OrderDetails {get;set;}
 public DbSet<Payment> Payments {get;set;}
-public DbSet<CategoryDto> category {get; set;}
 public DbSet<Address> Address {get; set;}
-public DbSet<Payment> payments {get;set;}
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity=>{
