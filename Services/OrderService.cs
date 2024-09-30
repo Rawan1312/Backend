@@ -75,7 +75,7 @@ public OrderService(AppDBContext appDbContext){
     }
     catch (Exception)
     {
-        throw new ApplicationException("Error occurred while retrieving the user.");
+        throw new ApplicationException("Error occurred while retrieving the order.");
     }
 }
    public async Task<bool> DeleteOrderByIdService(Guid id)

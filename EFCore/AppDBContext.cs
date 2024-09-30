@@ -6,7 +6,7 @@ public DbSet<Product> Product {get; set;}
 public DbSet<Category> Category {get; set;}
 public DbSet<Order> Orders{get;set;}
 public DbSet<OrderDetail> OrderDetails {get;set;}
-public DbSet<Payment> payments {get;set;}
+public DbSet<Payment> Payments {get;set;}
 public DbSet<CategoryDto> category {get; set;}
 public DbSet<AddressDto> Address {get; set;}
 
@@ -53,7 +53,7 @@ public DbSet<AddressDto> Address {get; set;}
           entity.HasKey(e=>e.PaymentId);
           entity.Property(e=>e.PaymentId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.Amount).IsRequired().HasColumnType("decimal(29,18)");
-          entity.Property(e => e.PaymentMethod).IsRequired() .HasConversion<string>();
+          entity.Property(e => e.PaymentMethods).IsRequired() .HasConversion<string>();
             });
           });
 

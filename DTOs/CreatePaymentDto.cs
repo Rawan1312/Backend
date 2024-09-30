@@ -1,5 +1,7 @@
 public class CreatePaymentDto
 {
+  public required Guid PaymentId{get;set;}
   public  required decimal Amount{get;set;}
-  public enum PaymentMethod;
+  public  PaymentMethod  PaymentMethods {get; set;} 
+
 }
