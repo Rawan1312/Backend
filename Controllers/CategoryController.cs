@@ -81,12 +81,12 @@ public async Task<IActionResult> DeleteCategory(Guid id)
 
 
      [HttpPost]
-    public async Task<IActionResult> CreatCategory([FromBody]CreateCategoryDto newcategory)
+    public async Task<IActionResult> CreatCategoryDto([FromBody]CreateCategoryDto newcategory)
     {
         try
         {
             var category = await _categoryservice.CreateCategoryService(newcategory);
-            var response=new{Message="creat the users",Category=category};
+            var response=new{Message="creat the Category",Category=category};
         return Created($"/api/category/{category.CategoryId}",response);
         }
         catch (ApplicationException ex)

@@ -36,7 +36,7 @@ public class ProductController : ControllerBase
   }}
 
   //? GET => /api/products/{id} => Get a single product by Id
-  [HttpGet("{ProId}")]
+  [HttpGet("{ProductId}")]
 public async Task<IActionResult> GetProductById(Guid ProId)
 {
     try

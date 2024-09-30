@@ -59,7 +59,7 @@ public CategoryService(AppDBContext appDbContext){
 //     };
 
 //     return paginatedResult;}}
-    public async Task<List<CategoryDto>> GetAllCategoryService()
+    public async Task<List<Category>> GetAllCategoryService()
     {
       try
       {
@@ -87,7 +87,7 @@ public CategoryService(AppDBContext appDbContext){
         var CategoryDto = new CategoryDto
         {
             CategoryId = category.CategoryId,
-            Name = category.Name,
+            CategoryName = category.CategoryName,
             Description = category.Description,
             // Map other properties as needed
         };
@@ -118,13 +118,13 @@ public CategoryService(AppDBContext appDbContext){
         throw new ApplicationException("Error occurred while deleting the category.");
     }
 }
-public async Task<CategoryDto> CreateCategoryService(CreateCategoryDto newcategory)
+public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
     {
       try
       {
-        var category = new CategoryDto {
+        var category = new Category {
           CategoryId=newcategory.CategoryId,
-          Name = newcategory.Name,};
+          CategoryName = newcategory.CategoryName,};
          
          await _appDbContext.Category.AddAsync(category);
          await _appDbContext.SaveChangesAsync();
@@ -136,7 +136,7 @@ public async Task<CategoryDto> CreateCategoryService(CreateCategoryDto newcatego
         throw new ApplicationException("erorr ocurred when creat the  category ");
       }
     }
-    public async Task<CategoryDto> UpdateCategoryService(Guid id, CategoryDto updateCategory)
+    public async Task<Category> UpdateCategoryService(Guid id, CategoryDto UpdateCategoryDto)
 {
     try
     {
@@ -147,8 +147,8 @@ public async Task<CategoryDto> CreateCategoryService(CreateCategoryDto newcatego
             throw new ApplicationException("category not found.");
         }
 
-        existingcategory.Name = updateCategory.Name ?? existingcategory.Name;
-        existingcategory.Description = updateCategory.Description ?? existingcategory.Description;
+        existingcategory.CategoryName = UpdateCategoryDto.CategoryName ?? existingcategory.CategoryName;
+        existingcategory.Description = UpdateCategoryDto.Description ?? existingcategory.Description;
 
         _appDbContext.Category.Update(existingcategory);
         await _appDbContext.SaveChangesAsync();
@@ -160,5 +160,4 @@ public async Task<CategoryDto> CreateCategoryService(CreateCategoryDto newcatego
         throw new ApplicationException("Error occurred when updating the user.");
     }
 }
-    }
-  
+}
