@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-
 public class AppDBContext:DbContext{
 public AppDBContext(DbContextOptions<AppDBContext> options):base(options){}
 public DbSet<User> Users {get; set;}
@@ -7,9 +6,10 @@ public DbSet<Product> Product {get; set;}
 public DbSet<Category> Category {get; set;}
 public DbSet<Order> Orders{get;set;}
 public DbSet<OrderDetail> OrderDetails {get;set;}
-public DbSet<Payment> payments {get;set;}
-
+public DbSet<Payment> Payments {get;set;}
+public DbSet<CategoryDto> category {get; set;}
 public DbSet<Address> Address {get; set;}
+public DbSet<Payment> payments {get;set;}
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity=>{
@@ -46,14 +46,14 @@ public DbSet<Address> Address {get; set;}
           modelBuilder.Entity<OrderDetail>(entity=>{
           entity.HasKey(e=>e.OrderDetailId);
           entity.Property(e=>e.OrderDetailId).HasDefaultValueSql("uuid_generate_v4()");
-          entity.Property(e=>e.Total_Price).IsRequired().HasMaxLength(200);
+          entity.Property(e=>e.TotalPrice).IsRequired().HasMaxLength(200);
           entity.Property(e=>e.Quantity);
             });
           modelBuilder.Entity<Payment>(entity=>{
           entity.HasKey(e=>e.PaymentId);
           entity.Property(e=>e.PaymentId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.Amount).IsRequired().HasColumnType("decimal(29,18)");
-          entity.Property(e => e.PaymentMethod).IsRequired() .HasConversion<string>();
+          entity.Property(e => e.PaymentMethods).IsRequired() .HasConversion<string>();
             });
           });
 
