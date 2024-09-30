@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 
-
+public interface IUserService{
+    Task<List<User>> GetAllUsersService();
+    Task<User> CreateUserService(CreateUserDto newuser);
+    Task<UserDto?> GetUserByIdService(Guid userId);
+    Task<bool> DeleteUserByIdService(Guid id);
+    Task<User> UpdateUserService(Guid id, UpdateUser updateUser);
+}
 public class UserService
   {
 private readonly AppDBContext _appDbContext;
