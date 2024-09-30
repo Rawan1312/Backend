@@ -8,6 +8,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<OrderDetailService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<ShipmentService>(); 
 builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 var app = builder.Build();

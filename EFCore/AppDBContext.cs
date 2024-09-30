@@ -7,9 +7,10 @@ public DbSet<Category> Category {get; set;}
 public DbSet<Order> Orders{get;set;}
 public DbSet<OrderDetail> OrderDetails {get;set;}
 public DbSet<Payment> Payments {get;set;}
-public DbSet<CategoryDto> category {get; set;}
 public DbSet<Address> Address {get; set;}
 public DbSet<Payment> payments {get;set;}
+
+public DbSet<Shipment> Shipment {get; set;}
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity=>{
@@ -62,6 +63,14 @@ public DbSet<Payment> payments {get;set;}
           entity.Property(e=>e.AddressId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.City).IsRequired().HasMaxLength(100);
           entity.Property(e=>e.State).IsRequired();
+        
+          });
+
+          modelBuilder.Entity<ShipmentDto>(entity=>{
+          entity.HasKey(e=>e.ShipmentId);
+          entity.Property(e=>e.ShipmentId).HasDefaultValueSql("uuid_generate_v4()");
+          entity.Property(e=>e.ShipmentDate).IsRequired().HasMaxLength(100);
+
         
           });
     }
