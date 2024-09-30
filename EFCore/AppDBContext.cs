@@ -5,6 +5,8 @@ public AppDBContext(DbContextOptions<AppDBContext> options):base(options){}
 public DbSet<User> Users {get; set;}
 public DbSet<Product> Product {get; set;}
 public DbSet<CategoryDto> Category {get; set;}
+
+public DbSet<AddressDto> Address {get; set;}
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity=>{
@@ -33,6 +35,14 @@ public DbSet<CategoryDto> Category {get; set;}
           entity.Property(e=>e.CategoryId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.Name).IsRequired().HasMaxLength(200);
           entity.Property(e=>e.Description);
+          });
+
+           modelBuilder.Entity<AddressDto>(entity=>{
+          entity.HasKey(e=>e.AddressId);
+          entity.Property(e=>e.AddressId).HasDefaultValueSql("uuid_generate_v4()");
+          entity.Property(e=>e.City).IsRequired().HasMaxLength(100);
+          entity.Property(e=>e.State).IsRequired();
+        
           });
     }
 
