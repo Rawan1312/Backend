@@ -10,7 +10,7 @@ public class AddressService
 public AddressService(AppDBContext appDbContext){
   _appDbContext=appDbContext;
 }
-    public async Task<List<AddressDto>> GetAllAddressService() {
+    public async Task<List<Address>> GetAllAddressService() {
       try{
         var address= await _appDbContext.Address.ToListAsync();
       return address;

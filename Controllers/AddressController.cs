@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/api/address")]
+[Route("/api/Address")]
 public class AddressController : ControllerBase
 {
   private readonly AddressService _addressService;

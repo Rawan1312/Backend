@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/api/v1/users")]
+[Route("/api/v1/Category")]
 public class CategoryController : ControllerBase
 {
   private readonly CategoryService _categoryservice;
