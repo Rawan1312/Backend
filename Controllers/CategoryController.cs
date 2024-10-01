@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -25,11 +26,11 @@ public class CategoryController : ControllerBase
         catch (ApplicationException ex)
         {
             
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }
-        catch (Exception ex){
+        catch (System.Exception ex){
             
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }}
 
     [HttpGet("{categoryId}")]
@@ -41,18 +42,18 @@ public async Task<IActionResult> GetCategoryById(Guid categoryId)
         
         if (category == null)
         {
-            return NotFound(new { Message = "cayegory not found" });
+            return ApiResponse.NotFound( "category not found" );
         }
         
-        return Ok(category);
+        return ApiResponse.Success(category,"user is retuned succcessfuly");
     }
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }
-    catch (Exception ex)
+    catch (System.Exception ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }
 }
 
@@ -62,21 +63,21 @@ public async Task<IActionResult> DeleteCategory(Guid id)
     try
     {
         var result = await _categoryservice.DeleteCategoryByIdService(id);
-        if (result)
+        if (result==true)
         {
-            return Ok(new { Message = "category deleted successfully" });
+        return ApiResponse.Success("category is deleted successfuly");
         }
         else
         {
-            return NotFound(new { Message = "category not found" });
+            return ApiResponse.NotFound($"categoty with this id {id}dose not exist" );
         }}
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }
-    catch (Exception ex)
+    catch (System.Exception ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }}
 
 
@@ -87,16 +88,16 @@ public async Task<IActionResult> DeleteCategory(Guid id)
         {
             var category = await _categoryservice.CreateCategoryService(newcategory);
             var response=new{Message="creat the Category",Category=category};
-        return Created($"/api/category/{category.CategoryId}",response);
+        return ApiResponse.Created("user is created successfuly");
         }
         catch (ApplicationException ex)
         {
             
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }}
 [HttpPut("{id}")]
 public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] CategoryDto updatecategory)
@@ -105,25 +106,24 @@ public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] CategoryDto 
     {
         if (updatecategory == null)
         {
-            return BadRequest("Invalid user data.");}
+            return ApiResponse.BadRequest("Invalid user data.");}
 
         var updatedcategory = await _categoryservice.UpdateCategoryService(id, updatecategory);
         
         if (updatedcategory == null)
         {
-            return NotFound("category not found.");
+            return ApiResponse.NotFound("category not found.");
         }
+                return ApiResponse.Success(updatedcategory,"category is updated successfuly");
 
-        var response = new { Message = "category updated successfully", Category= updatedcategory };
-        return Ok(response);
     }
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }
-    catch (Exception ex)
+    catch (System.Exception ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }
 }  
 }

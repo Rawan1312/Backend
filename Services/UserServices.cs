@@ -13,7 +13,7 @@ public interface IUserService{
     Task<bool> DeleteUserByIdService(Guid id);
     Task<User> UpdateUserService(Guid id, UpdateUser updateUser);
 }
-public class UserService
+public class UserService:IUserService
   {
 private readonly AppDBContext _appDbContext;
 public UserService(AppDBContext appDbContext){
@@ -108,12 +108,12 @@ public UserService(AppDBContext appDbContext){
 
         if (existingUser == null)
         {
-            throw new ApplicationException("User not found.");
+            return null;
         }
 
         existingUser.Name = updateUser.Name ?? existingUser.Name;
         existingUser.Email = updateUser.Email ?? existingUser.Email;
-        existingUser.Password = updateUser.Password ?? existingUser.Password;
+        existingUser.Password = updateUser.Password??existingUser.Password;
 
         _appDbContext.Users.Update(existingUser);
         await _appDbContext.SaveChangesAsync();

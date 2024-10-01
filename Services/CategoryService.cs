@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 public interface ICategoryService{
@@ -15,7 +16,9 @@ public class CategoryService
   {
 
     private readonly AppDBContext _appDbContext;
-public CategoryService(AppDBContext appDbContext){
+    private readonly IMapper _mapper;
+public CategoryService(AppDBContext appDbContext,IMapper mapper){
+    _mapper = mapper;
   _appDbContext=appDbContext;
 }
       

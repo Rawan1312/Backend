@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -26,11 +27,11 @@ public class UserController : ControllerBase
         catch (ApplicationException ex)
         {
             
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }
-        catch (Exception ex){
+        catch (System.Exception ex){
             
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }}
 
 [HttpGet("{userId}")]
@@ -39,44 +40,44 @@ public async Task<IActionResult> GetUserById(Guid userId)
     try
     {
         var user = await _userService.GetUserByIdService(userId);
-        
         if (user == null)
-        {
-            return NotFound(new { Message = "User not found" });
+        { 
+            // cheng her
+            return ApiResponse.NotFound( "User not found" );
         }
-        
-        return Ok(user);
+        return ApiResponse.Success(user,"user is retuned succcessfuly");
     }
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+        return ApiResponse.ServerError("server error:"+ ex.Message);
     }
-    catch (Exception ex)
+    catch (System.Exception ex)
     {
-        return StatusCode(500, ex.Message);
+        return ApiResponse.ServerError("server error:"+ ex.Message);
     }
 }
+// اتاكدي منها 
+
 [HttpDelete("{id}")]
 public async Task<IActionResult> DeleteUser(Guid id)
 {
     try
     {
         var result = await _userService.DeleteUserByIdService(id);
-        if (result)
+        if (result==false)
         {
-            return Ok(new { Message = "User deleted successfully" });
+            return ApiResponse.NotFound($"User with this id {id}dose not exist" );
         }
-        else
-        {
-            return NotFound(new { Message = "User not found" });
-        }}
+        return ApiResponse.Success(User,"user is deleted successfuly");
+        
+        }
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+        return ApiResponse.ServerError("server error:"+ ex.Message);
     }
-    catch (Exception ex)
+    catch (System.Exception ex)
     {
-        return StatusCode(500, ex.Message);
+        return ApiResponse.ServerError("server error:"+ ex.Message);
     }}
 
 [HttpPost]
@@ -86,16 +87,16 @@ public async Task<IActionResult> DeleteUser(Guid id)
         {
             var user = await _userService.CreateUserService(newuser);
             var response=new{Message="creat the users",Users=user};
-        return Created($"/api/users/{user.UserId}",response);
+        return ApiResponse.Created("user is created successfuly");
         }
         catch (ApplicationException ex)
         {
             
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }}
 [HttpPut("{id}")]
 public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUser updateUser)
@@ -104,25 +105,23 @@ public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUser updat
     {
         if (updateUser == null)
         {
-            return BadRequest("Invalid user data.");}
+            return ApiResponse.BadRequest("Invalid user data.");}
 
         var updatedUser = await _userService.UpdateUserService(id, updateUser);
         
         if (updatedUser == null)
         {
-            return NotFound("User not found.");
+            return ApiResponse.NotFound("User not found.");
         }
-
-        var response = new { Message = "User updated successfully", User = updatedUser };
-        return Ok(response);
+        return ApiResponse.Success(updatedUser,"user is updated successfuly");
     }
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+         return ApiResponse.ServerError("server error:"+ ex.Message);
     }
-    catch (Exception ex)
+    catch (System.Exception ex)
     {
-        return StatusCode(500, ex.Message);
+         return ApiResponse.ServerError("server error:"+ ex.Message);
     }
 }  
 }
