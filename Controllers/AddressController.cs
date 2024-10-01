@@ -8,10 +8,16 @@ using Microsoft.AspNetCore.Mvc;
 [Route("/api/Address")]
 public class AddressController : ControllerBase
 {
-  private readonly AddressService _addressService;
-    public AddressController(AppDBContext appDbContext) {
-    _addressService = new AddressService(appDbContext);
-}
+    private readonly AddressService _addressService;
+ public AddressController(AddressService addressService)
+ {
+   _addressService = addressService;
+ }
+//   private readonly AddressService _addressService;
+//     public AddressController(AppDBContext appDbContext) {
+//     _addressService = new AddressService(appDbContext);
+
+//? GET => /api/address => Get all the address
 [HttpGet]
 
   public async Task<IActionResult> GetAllAddress()
@@ -31,7 +37,7 @@ public class AddressController : ControllerBase
             
             return StatusCode(500, ex.Message);
         }}
-    
+    //? GET => /api/address/{id} => Get a single address by Id
     [HttpGet("{addressId}")]
     public async Task<IActionResult> GetSingleAddressById(Guid addressId)
     {
@@ -58,6 +64,7 @@ public class AddressController : ControllerBase
     }
     }
 
+  // //? Delete => /api/address/{id} => delete a single address by Id
     [HttpDelete("{addressId}")]
     public  async Task<IActionResult> DeleteaddressById(Guid addressId)
     {
@@ -84,7 +91,7 @@ public class AddressController : ControllerBase
 
 
      [HttpPost]
-    public async Task<IActionResult> CreateAddress(AddressDto newaddress)
+    public async Task<IActionResult> CreateAddress([FromBody]CreateAddressDto newaddress) // Make sure that its AddressDto - NOT CreateAddressDto
     {
       try{
            var address = await _addressService.CreateAddressService(newaddress);
@@ -100,4 +107,33 @@ public class AddressController : ControllerBase
         {
             return StatusCode(500, ex.Message);
         }
-}}
+}
+[HttpPut("{addressId}")]
+public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] UpdateAddress updateAddress)
+{
+    try
+    {
+        if (updateAddress == null)
+        {
+            return BadRequest("Invalid address data.");}
+
+        var updatedAddress = await _addressService.UpdateAddressService(id, updateAddress);
+        
+        if (updateAddress == null)
+        {
+            return NotFound("address not found.");
+        }
+
+        var response = new { Message = "Address updated successfully", Address = updatedAddress };
+        return Ok(response);
+    }
+    catch (ApplicationException ex)
+    {
+        return StatusCode(500, ex.Message);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, ex.Message);
+    }}
+
+}

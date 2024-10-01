@@ -7,13 +7,24 @@ using Microsoft.AspNetCore.Mvc;
 [ApiController]
 [Route("/api/v1/shipment")]
 public class ShipmentController : ControllerBase
+//  private readonly ShipmentService _shipmentservice;
+//     public ShipmentController(ShipmentService shipmentService)
+//     {
+//         _shipmentservice = shipmentservice;
+//     }
+
 {
-    private readonly ShipmentService _shipmentService;
+     private readonly ShipmentService _shipmentService;
     public ShipmentController(ShipmentService shipmentService)
     {
         _shipmentService = shipmentService;
     }
-
+    // private readonly ShipmentService _shipmentService;
+    // public ShipmentController(ShipmentService shipmentService)
+    // {
+    //     _shipmentService = shipmentService;
+    // }
+//? GET => /api/v1/shipment => Get all the shipments
     [HttpGet]
     public async Task<IActionResult> GetAllShipment()
     {

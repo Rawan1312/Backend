@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 
-
+public interface IShipmentService{
+    Task<List<Shipment>> GetAllShipmentService();
+    Task<ShipmentDto?> GetShipmentByIdService(Guid Id);
+    Task<bool> DeleteShipmentByIdService(Guid id);
+    Task<Shipment> CreateShipmentService(CreateShipment newshipment);
+     Task<Product> UpdateShipmentService(Guid id, UpdateShipment updateShipment);
+}
 public class ShipmentService
   {
 private readonly AppDBContext _appDbContext;
@@ -53,13 +59,14 @@ public ShipmentService(AppDBContext appDbContext){
 
         if (shipment == null)
         {
-            return null; // Return null if user not found
+            return null; // Return null if shipment not found
         }
 
-        // Convert User to UserDto if needed
+        // Convert shipment to ShipmentDto if needed
         var shipmentDto = new ShipmentDto
         {
             ShipmentId = shipment.ShipmentId,
+            CompanyName = shipment.CompanyName,
            
             // Map other properties as needed
         };

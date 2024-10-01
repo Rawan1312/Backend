@@ -69,6 +69,7 @@ public DbSet<Shipment> Shipment {get; set;}
           modelBuilder.Entity<ShipmentDto>(entity=>{
           entity.HasKey(e=>e.ShipmentId);
           entity.Property(e=>e.ShipmentId).HasDefaultValueSql("uuid_generate_v4()");
+          entity.Property(e=>e.CompanyName).IsRequired().HasMaxLength(100);
           entity.Property(e=>e.ShipmentDate).IsRequired().HasMaxLength(100);
 
         

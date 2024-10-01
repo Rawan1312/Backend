@@ -4,16 +4,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
+public interface IAddressService{
+    Task<List<Address>> GetAllAddressService();
+    Task<AddressDto?> GetAddressByIdService(Guid AddressId);
+    Task<bool> DeleteAddressByIdService(Guid id);
+    Task<Address> CreateAddressService(CreateAddressDto newaddress);
+    Task<Address> UpdateAddressService(Guid id, AddressDto updateAddressDto);
+    }
+
 public class AddressService
   {
   private readonly AppDBContext _appDbContext;
 public AddressService(AppDBContext appDbContext){
   _appDbContext=appDbContext;
 }
-    public async Task<List<Address>> GetAllAddressService() {
+    public async Task<List<Address>>
+    // Make sure
+      GetAllAddressService() {
       try{
         var address= await _appDbContext.Address.ToListAsync();
-      return address;
+      return address; // make sure
       }
        catch (System.Exception)
       {
@@ -38,7 +48,7 @@ public AddressService(AppDBContext appDbContext){
             return null; 
         }
         
-        var addressDto = new AddressDto
+        var addressDto = new AddressDto   // Make sure
         {
             AddressId = address.AddressId,
             City = address.City,
@@ -46,14 +56,15 @@ public AddressService(AppDBContext appDbContext){
             // Map other properties as needed
         };
 
-        return addressDto;
+        return addressDto; // make sure
     }
     catch (Exception)
     {
         throw new ApplicationException("Error occurred while retrieving the address.");
     }}
-    public async Task<Address> CreateAddressService(AddressDto newAddress)
+    public async Task<Address> CreateAddressService(CreateAddressDto newAddress)
     {
+      // Make sure AddressDto newAddress & Task<Address> I think CreateAddressDto newAddress
       try{
         var address = new Address
         {
@@ -89,7 +100,9 @@ public AddressService(AppDBContext appDbContext){
         throw new ApplicationException("Error occurred while deleting the address.");
     }
    } 
-    public async Task<Address> UpdateAddressService(Guid id, AddressDto updateAddress)
+    public async Task<Address> UpdateAddressService(Guid id, UpdateAddress updateAddress)
+    // Make sure change From (Task<Address>) AddressDto => Address
+    // before editung was variable updateAddress from AddressDto
 {
     try
     {
