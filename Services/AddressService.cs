@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 public interface IAddressService{
@@ -15,8 +17,11 @@ public interface IAddressService{
 public class AddressService
   {
   private readonly AppDBContext _appDbContext;
-public AddressService(AppDBContext appDbContext){
-  _appDbContext=appDbContext;
+
+  private readonly IMapper _mapper;
+public AddressService(AppDBContext appDbContext , IMapper mapper ){
+  _appDbContext=appDbContext; 
+  _mapper = mapper ; 
 }
     public async Task<List<Address>>
     // Make sure
@@ -40,7 +45,8 @@ public AddressService(AppDBContext appDbContext){
     public async Task<AddressDto?> GetAddresssByIdService(Guid id)
     {
       try{
-      var address = await _appDbContext.Address
+         var address = _mapper.Map<AddressDto?>(id);
+       await _appDbContext.Address 
             .FirstOrDefaultAsync(d => d.AddressId == id);
 
         if (address == null)
@@ -48,15 +54,15 @@ public AddressService(AppDBContext appDbContext){
             return null; 
         }
         
-        var addressDto = new AddressDto   // Make sure
-        {
-            AddressId = address.AddressId,
-            City = address.City,
-            State = address.State,
-            // Map other properties as needed
-        };
+        // var addressDto = new AddressDto   // Make sure
+        // {
+        //     AddressId = address.AddressId,
+        //     City = address.City,
+        //     State = address.State,
+        //     // Map other properties as needed
+        // };_mapper.Map<Address>(newAddress);
 
-        return addressDto; // make sure
+        return _mapper.Map<AddressDto?>(address); // make sure
     }
     catch (Exception)
     {
@@ -66,12 +72,10 @@ public AddressService(AppDBContext appDbContext){
     {
       // Make sure AddressDto newAddress & Task<Address> I think CreateAddressDto newAddress
       try{
-        var address = new Address
-        {
-       AddressId = newAddress.AddressId,
-        City = newAddress.City, 
-        State = newAddress.State ,// user must add city & state => its re
-        };
+        var address = _mapper.Map<Address>(newAddress);
+
+       // user must add city & state 
+      
       //_Address.Add(address);
       await _appDbContext.Address.AddAsync(address);
          await _appDbContext.SaveChangesAsync();
@@ -106,6 +110,7 @@ public AddressService(AppDBContext appDbContext){
 {
     try
     {
+      //  var address = _mapper.Map<Address>(updateAddress ,existingaddress );
         var existingaddress = await _appDbContext.Address.FindAsync(id);
 
         if (existingaddress == null)
@@ -113,9 +118,9 @@ public AddressService(AppDBContext appDbContext){
             throw new ApplicationException("address not found.");
         }
 
-        existingaddress.City = updateAddress.City ?? existingaddress.City;
-        existingaddress.State = updateAddress.State ?? existingaddress.State;
-
+        // existingaddress.City = updateAddress.City ?? existingaddress.City;
+        // existingaddress.State = updateAddress.State ?? existingaddress.State;
+       _mapper.Map(updateAddress ,existingaddress );
         _appDbContext.Address.Update(existingaddress);
         await _appDbContext.SaveChangesAsync();
 
@@ -125,5 +130,5 @@ public AddressService(AppDBContext appDbContext){
     {
         throw new ApplicationException("Error occurred when updating the address.");
     }
-}
-   }
+} }
+   

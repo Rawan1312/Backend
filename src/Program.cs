@@ -8,6 +8,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<OrderDetailService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<ShipmentService>(); 
 builder.Services.AddDbContext<AppDBContext>(options =>

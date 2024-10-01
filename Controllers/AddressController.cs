@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -25,17 +26,17 @@ public class AddressController : ControllerBase
         try
         {
             var address = await _addressService.GetAllAddressService();
-            var response=new{Message="return all the address",Address=address};
-        return Ok(response);
+         //   var response=new{Message="return all the address",Address=address};
+        return ApiResponse.Success(address,"Return Address is successfly ");
         }
         catch (ApplicationException ex)
         {
             
-            return StatusCode(500, ex.Message);
+            return ApiResponse.ServerError("Server Error"+ ex.Message);
         }
         catch (Exception ex){
             
-            return StatusCode(500, ex.Message);
+            return ApiResponse.ServerError("Server Error"+ ex.Message);
         }}
     //? GET => /api/address/{id} => Get a single address by Id
     [HttpGet("{addressId}")]
@@ -50,17 +51,17 @@ public class AddressController : ControllerBase
 
         if (address == null)
         {
-            return NotFound($"address with {addressId} does not exist");
+            return ApiResponse.NotFound($"address with {addressId} does not exist");
         }
-        return Ok(address);
+        return ApiResponse.Success(address,"Return address by ID Successfly");
     }
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+       return ApiResponse.ServerError("Server Error"+ ex.Message);
     }
     catch (Exception ex)
     {
-        return StatusCode(500, ex.Message);
+         return ApiResponse.ServerError("Server Error"+ ex.Message);
     }
     }
 
@@ -73,19 +74,19 @@ public class AddressController : ControllerBase
     
         if (result)
         {
-            return Ok(new { Message = "address deleted successfully" });
+            return ApiResponse.Success(result , "Delete Address ById Successfly");
         }
         else
         {
-            return NotFound(new { Message = "address not found" });
+            return ApiResponse.NotFound("address not found" );
         }}
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+        return ApiResponse.ServerError("Server Error"+ ex.Message);
     }
     catch (Exception ex)
     {
-        return StatusCode(500, ex.Message);
+         return ApiResponse.ServerError("Server Error"+ ex.Message);
     }
 }
 
@@ -95,17 +96,18 @@ public class AddressController : ControllerBase
     {
       try{
            var address = await _addressService.CreateAddressService(newaddress);
-       var response=new{Message="creat the address",Address=address};
-        return Created($"/api/address/{address.AddressId}",response);
+      // var response=new{Message="creat the address",Address=address};
+        return ApiResponse.Created(address,"creat the address");
+        // return ApiResponse.Success(address,"Create Address Successfly")
         }
         catch (ApplicationException ex)
         {
             
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("Server Error"+ ex.Message);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+           return ApiResponse.ServerError("Server Error"+ ex.Message);
         }
 }
 [HttpPut("{addressId}")]
@@ -115,25 +117,25 @@ public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] UpdateAddress
     {
         if (updateAddress == null)
         {
-            return BadRequest("Invalid address data.");}
+            return ApiResponse.BadRequest("Invalid address data.");}
 
         var updatedAddress = await _addressService.UpdateAddressService(id, updateAddress);
         
         if (updateAddress == null)
         {
-            return NotFound("address not found.");
+            return ApiResponse.NotFound("address not found.");
         }
 
-        var response = new { Message = "Address updated successfully", Address = updatedAddress };
-        return Ok(response);
+        //var response = new { Message = "Address updated successfully", Address = updatedAddress };
+        return ApiResponse.Success(updatedAddress,"Address updated successfully");
     }
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+        return ApiResponse.ServerError("Server Error"+ ex.Message);
     }
     catch (Exception ex)
     {
-        return StatusCode(500, ex.Message);
+        return ApiResponse.ServerError("Server Error"+ ex.Message);
     }}
 
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -16,8 +17,10 @@ public interface IShipmentService{
 public class ShipmentService
   {
 private readonly AppDBContext _appDbContext;
-public ShipmentService(AppDBContext appDbContext){
+ private readonly IMapper _mapper;
+public ShipmentService(AppDBContext appDbContext , IMapper mapper){
   _appDbContext=appDbContext;
+   _mapper = mapper ;
 }      
 
     public async Task<List<Shipment>> GetAllShipmentService()
@@ -37,8 +40,8 @@ public ShipmentService(AppDBContext appDbContext){
     {
       try
       {
-        var shipment = new Shipment {
-          ShipmentDate = newshipment.shipmentDate };
+        var shipment = _mapper.Map<Shipment>(newshipment);
+        //   ShipmentDate = newshipment.shipmentDate };
          await _appDbContext.Shipment.AddAsync(shipment);
          await _appDbContext.SaveChangesAsync();
          return shipment;
@@ -47,15 +50,15 @@ public ShipmentService(AppDBContext appDbContext){
       {
         
         throw new ApplicationException("erorr ocurred when creat the  shipment ");
-      }
+      } 
     }
 
     public async Task<ShipmentDto?> GetShipmentByIdService(Guid id)
 {
     try
     {
-        var shipment = await _appDbContext.Shipment
-            .FirstOrDefaultAsync(u => u.ShipmentId == id);
+        var shipment = _mapper.Map<ShipmentDto?>(id);
+        await _appDbContext.Shipment .FirstOrDefaultAsync(u => u.ShipmentId == id);
 
         if (shipment == null)
         {
@@ -63,15 +66,15 @@ public ShipmentService(AppDBContext appDbContext){
         }
 
         // Convert shipment to ShipmentDto if needed
-        var shipmentDto = new ShipmentDto
-        {
-            ShipmentId = shipment.ShipmentId,
-            CompanyName = shipment.CompanyName,
+       // var shipmentDto = new ShipmentDto
+        // {
+        //     ShipmentId = shipment.ShipmentId,
+        //     CompanyName = shipment.CompanyName,
            
-            // Map other properties as needed
-        };
+        //     // Map other properties as needed
+        // };
 
-        return shipmentDto;
+        return _mapper.Map<ShipmentDto?>(shipment);
     }
     catch (Exception)
     {
@@ -108,8 +111,8 @@ public ShipmentService(AppDBContext appDbContext){
         {
             throw new ApplicationException("Shipment not found.");
         }
-
-        existingShipment.ShipmentDate = updateShipment.ShipmentDate ; 
+        _mapper.Map(updateShipment ,existingShipment );
+        //existingShipment.ShipmentDate = updateShipment.ShipmentDate ; 
         _appDbContext.Shipment.Update(existingShipment);
         await _appDbContext.SaveChangesAsync();
 
@@ -118,6 +121,6 @@ public ShipmentService(AppDBContext appDbContext){
     catch (System.Exception)
     {
         throw new ApplicationException("Error occurred when updating the shipment.");
-    }
+    } 
 }
-    }
+    } 
