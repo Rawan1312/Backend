@@ -15,15 +15,17 @@ namespace ecommerce_db_api.Mappers
         public MappingProfile()
         {
 
-            CreateMap<User, UserDto>();
+            CreateMap<UserDto,User>();
             CreateMap<CreateUserDto, User>();
 
+
             CreateMap<CreateCategoryDto, Category>();
-            CreateMap<Category, CategoryDto>();
+            CreateMap<UpdateCategoryDto, Category>();
+            CreateMap<Category, CategoryDto>().ReverseMap();
 
 
-            CreateMap<Product, ProductDto>();
-        CreateMap<UpdateProductDto, ProductDto>();
+        CreateMap<ProductDto,Product >();
+         CreateMap<UpdateProductDto, Product>();
         CreateMap<CreateProductDto, Product>();
 
         }

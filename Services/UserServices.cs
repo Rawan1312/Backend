@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AutoMapper;
+
 using Microsoft.EntityFrameworkCore;
 
 
@@ -16,9 +18,11 @@ public interface IUserService{
 public class UserService:IUserService
   {
 private readonly AppDBContext _appDbContext;
-public UserService(AppDBContext appDbContext){
+private readonly IMapper _mapper;
+public UserService(AppDBContext appDbContext,IMapper mapper){
+    _mapper = mapper;
   _appDbContext=appDbContext;
-}      
+}     
 
     public async Task<List<User>> GetAllUsersService()
     {
@@ -37,10 +41,7 @@ public UserService(AppDBContext appDbContext){
     {
       try
       {
-        var user = new User {
-          Name=newuser.Name,
-          Email = newuser.Email,
-         Password = newuser.Password};
+        var user = _mapper.Map<User>(newuser);
          await _appDbContext.Users.AddAsync(user);
          await _appDbContext.SaveChangesAsync();
          return user;
@@ -64,16 +65,7 @@ public UserService(AppDBContext appDbContext){
             return null; // Return null if user not found
         }
 
-        // Convert User to UserDto if needed
-        var userDto = new UserDto
-        {
-            UserId = user.UserId,
-            Name = user.Name,
-            Email = user.Email,
-            // Map other properties as needed
-        };
-
-        return userDto;
+         return _mapper.Map<UserDto>(user);  
     }
     catch (Exception)
     {
@@ -111,9 +103,10 @@ public UserService(AppDBContext appDbContext){
             return null;
         }
 
-        existingUser.Name = updateUser.Name ?? existingUser.Name;
-        existingUser.Email = updateUser.Email ?? existingUser.Email;
-        existingUser.Password = updateUser.Password??existingUser.Password;
+        // existingUser.Name = updateUser.Name ?? existingUser.Name;
+        // existingUser.Email = updateUser.Email ?? existingUser.Email;
+        // existingUser.Password = updateUser.Password??existingUser.Password;
+        _mapper.Map(updateUser, existingUser);
 
         _appDbContext.Users.Update(existingUser);
         await _appDbContext.SaveChangesAsync();
