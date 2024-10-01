@@ -92,7 +92,7 @@ public CategoryService(AppDBContext appDbContext,IMapper mapper){
     }
     catch (Exception)
     {
-        throw new ApplicationException("Error occurred while retrieving the user.");
+        throw new ApplicationException("Error occurred while retrieving the category.");
     }
 }
      public async Task<bool> DeleteCategoryByIdService(Guid id)
@@ -153,7 +153,7 @@ public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
     }
     catch (System.Exception)
     {
-        throw new ApplicationException("Error occurred when updating the user.");
+        throw new ApplicationException("Error occurred when updating the category.");
     }
 }
 }

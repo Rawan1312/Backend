@@ -45,7 +45,7 @@ public async Task<IActionResult> GetUserById(Guid userId)
             // cheng her
             return ApiResponse.NotFound( "User not found" );
         }
-        return ApiResponse.Success(user,"user is retuned succcessfuly");
+        return ApiResponse.Success("user is retuned succcessfuly");
     }
     catch (ApplicationException ex)
     {
@@ -113,7 +113,7 @@ public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUser updat
         {
             return ApiResponse.NotFound("User not found.");
         }
-        return ApiResponse.Success(updatedUser,"user is updated successfuly");
+        return ApiResponse.Success("user is updated successfuly");
     }
     catch (ApplicationException ex)
     {
