@@ -92,7 +92,7 @@ public async Task<IActionResult> DeleteProduct(Guid id)
         {
             var product = await _productService.CreateProductService(newproduct);
             var response=new{Message="creat the users",Product=product};
-        return ApiResponse.Created("user is created successfuly");
+        return ApiResponse.Created(product,"product is created successfully");
         }
         catch (ApplicationException ex)
         {
