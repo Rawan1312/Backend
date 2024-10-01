@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-// using ecommerce_db_api.EFCore;
-// using ecommerce_db_api.Models;
-// using ecommerce_db_api.Models.categories;
-// using ecommerce_db_api.Models.products;
+
 
 namespace ecommerce_db_api.Mappers
 {
@@ -15,15 +12,17 @@ namespace ecommerce_db_api.Mappers
         public MappingProfile()
         {
 
-            CreateMap<User, UserDto>();
+            CreateMap<UserDto,User>();
             CreateMap<CreateUserDto, User>();
 
+
             CreateMap<CreateCategoryDto, Category>();
-            CreateMap<Category, CategoryDto>();
+            CreateMap<UpdateCategoryDto, Category>();
+            CreateMap<Category, CategoryDto>().ReverseMap();
 
 
-            CreateMap<Product, ProductDto>();
-        CreateMap<UpdateProductDto, ProductDto>();
+        CreateMap<ProductDto,Product >();
+         CreateMap<UpdateProductDto, Product>();
         CreateMap<CreateProductDto, Product>();
 
         }

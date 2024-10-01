@@ -140,9 +140,11 @@ public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
         {
             throw new ApplicationException("category not found.");
         }
-
-        existingcategory.CategoryName = UpdateCategoryDto.CategoryName ?? existingcategory.CategoryName;
-        existingcategory.Description = UpdateCategoryDto.Description ?? existingcategory.Description;
+            // BEFOR
+        // existingcategory.CategoryName = UpdateCategoryDto.CategoryName ?? existingcategory.CategoryName;
+        // existingcategory.Description = UpdateCategoryDto.Description ?? existingcategory.Description;
+        // AFTER
+        _mapper.Map(UpdateCategoryDto, existingcategory);
 
         _appDbContext.Category.Update(existingcategory);
         await _appDbContext.SaveChangesAsync();
