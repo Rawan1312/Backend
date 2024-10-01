@@ -14,6 +14,7 @@ namespace ecommerce_db_api.Mappers
 
             CreateMap<UserDto,User>();
             CreateMap<CreateUserDto, User>();
+            CreateMap<UpdateUser, User>();
 
 
             CreateMap<CreateCategoryDto, Category>();

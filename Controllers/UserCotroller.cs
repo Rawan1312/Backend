@@ -68,7 +68,7 @@ public async Task<IActionResult> DeleteUser(Guid id)
         {
             return ApiResponse.NotFound($"User with this id {id}dose not exist" );
         }
-        return ApiResponse.Success(User,"user is deleted successfuly");
+        return ApiResponse.Success("user is deleted successfuly");
         
         }
     catch (ApplicationException ex)
