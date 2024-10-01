@@ -86,16 +86,9 @@ public CategoryService(AppDBContext appDbContext,IMapper mapper){
         {
             return null; 
         }
-        
-        var CategoryDto = new CategoryDto
-        {
-            CategoryId = category.CategoryId,
-            CategoryName = category.CategoryName,
-            Description = category.Description,
-            // Map other properties as needed
-        };
+ 
 
-        return CategoryDto;
+        return _mapper.Map<CategoryDto>(category);
     }
     catch (Exception)
     {
@@ -125,9 +118,7 @@ public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
     {
       try
       {
-        var category = new Category {
-          CategoryId=newcategory.CategoryId,
-          CategoryName = newcategory.CategoryName,};
+        var category = _mapper.Map<Category>(newcategory);
          
          await _appDbContext.Category.AddAsync(category);
          await _appDbContext.SaveChangesAsync();
@@ -139,7 +130,7 @@ public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
         throw new ApplicationException("erorr ocurred when creat the  category ");
       }
     }
-    public async Task<Category> UpdateCategoryService(Guid id, CategoryDto UpdateCategoryDto)
+    public async Task<Category> UpdateCategoryService(Guid id, UpdateCategoryDto UpdateCategoryDto)
 {
     try
     {
