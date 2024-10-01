@@ -100,7 +100,7 @@ public async Task<IActionResult> DeleteCategory(Guid id)
              return ApiResponse.ServerError("server error:"+ ex.Message);
         }}
 [HttpPut("{id}")]
-public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] CategoryDto updatecategory)
+public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryDto updatecategory)
 {
     try
     {
