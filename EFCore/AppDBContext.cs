@@ -29,10 +29,10 @@ public DbSet<Shipment> Shipment {get; set;}
           entity.Property(e=>e.Price).IsRequired();
           entity.Property(e=>e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
           });
-          modelBuilder.Entity<Category>()
-            .HasMany(c => c.Products)
-            .WithOne(p => p.Category)
-            .HasForeignKey(p => p.CategoryId);
+          // modelBuilder.Entity<Category>()
+          //   .HasMany(c => c.Products)
+          //   .WithOne(p => p.Category)
+          //   .HasForeignKey(p => p.CategoryId);
             
           modelBuilder.Entity<Category>(entity=>{
           entity.HasKey(e=>e.CategoryId);

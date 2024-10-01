@@ -154,8 +154,6 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.ToTable("Product");
                 });
 
@@ -216,22 +214,6 @@ namespace Backend.Migrations
                     b.HasOne("Order", null)
                         .WithMany("OrderDetails")
                         .HasForeignKey("OrderId");
-                });
-
-            modelBuilder.Entity("Product", b =>
-                {
-                    b.HasOne("Category", "Category")
-                        .WithMany("Products")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("Category", b =>
-                {
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Order", b =>

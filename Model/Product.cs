@@ -6,6 +6,6 @@ public class  Product
   public decimal Price { get; set; }
   public DateTime CreatedAt { get; set; }
   public Guid CategoryId { get; set; }
-  public Category Category{ get; set; }= new Category();
+  // public Category Category{ get; set; }= new Category();
 
 }

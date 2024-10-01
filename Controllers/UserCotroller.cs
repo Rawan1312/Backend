@@ -6,7 +6,7 @@ using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/api/users")]
+[Route("/api/v1/users")]
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
