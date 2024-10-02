@@ -1,4 +1,5 @@
 using System.Security.Cryptography.X509Certificates;
+using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -28,11 +29,12 @@ public class ProductController : ControllerBase
         catch (ApplicationException ex)
         {
             
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
+
         }
-        catch (Exception ex){
+        catch (System.Exception ex){
             
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
   }}
 
   //? GET => /api/products/{id} => Get a single product by Id
@@ -45,18 +47,17 @@ public async Task<IActionResult> GetProductById(Guid ProId)
 
         if (pro == null)
         {
-            return NotFound(new { Message = "product not found" });
+            return ApiResponse.NotFound("product not found" );
         }
-
-        return Ok(pro);
+        return ApiResponse.Success(pro,"user is retuned succcessfuly");
     }
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }
-    catch (Exception ex)
+    catch (System.Exception ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }
 }
 
@@ -67,21 +68,21 @@ public async Task<IActionResult> DeleteProduct(Guid id)
     try
     {
         var result = await _productService.DeleteProductByIdService(id);
-        if (result)
+        if (result==true)
         {
-            return Ok(new { Message = "product deleted successfully" });
+            return ApiResponse.Success("product deleted successfully" );
         }
         else
         {
-            return NotFound(new { Message = "product not found" });
+            return ApiResponse.NotFound("product not found");
         }}
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }
-    catch (Exception ex)
+    catch (System.Exception ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }}
 
   [HttpPost]
@@ -91,16 +92,16 @@ public async Task<IActionResult> DeleteProduct(Guid id)
         {
             var product = await _productService.CreateProductService(newproduct);
             var response=new{Message="creat the users",Product=product};
-        return Created($"/api/product/{product.Id}",response);
+        return ApiResponse.Created("user is created successfuly");
         }
         catch (ApplicationException ex)
         {
             
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }}
 
 [HttpPut("{id}")]
@@ -110,24 +111,24 @@ public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProduct
     {
         if (updateProduct == null)
         {
-            return BadRequest("Invalid product data.");}
+            return ApiResponse.BadRequest("Invalid product data.");}
 
         var updatedProduct = await _productService.UpdateProductService(id, updateProduct);
         
         if (updatedProduct == null)
         {
-            return NotFound("product not found.");
+            return ApiResponse.NotFound("product not found.");
         }
 
-        var response = new { Message = "Product updated successfully", Product = updatedProduct };
-        return Ok(response);
+                return ApiResponse.Success(updateProduct,"product is updated successfuly");
+
     }
     catch (ApplicationException ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }
-    catch (Exception ex)
+    catch (System.Exception ex)
     {
-        return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
     }}
 }

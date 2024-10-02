@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 public interface ICategoryService{
@@ -15,7 +16,9 @@ public class CategoryService
   {
 
     private readonly AppDBContext _appDbContext;
-public CategoryService(AppDBContext appDbContext){
+    private readonly IMapper _mapper;
+public CategoryService(AppDBContext appDbContext,IMapper mapper){
+    _mapper = mapper;
   _appDbContext=appDbContext;
 }
       
@@ -83,16 +86,9 @@ public CategoryService(AppDBContext appDbContext){
         {
             return null; 
         }
-        
-        var CategoryDto = new CategoryDto
-        {
-            CategoryId = category.CategoryId,
-            CategoryName = category.CategoryName,
-            Description = category.Description,
-            // Map other properties as needed
-        };
+ 
 
-        return CategoryDto;
+        return _mapper.Map<CategoryDto>(category);
     }
     catch (Exception)
     {
@@ -122,9 +118,7 @@ public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
     {
       try
       {
-        var category = new Category {
-          CategoryId=newcategory.CategoryId,
-          CategoryName = newcategory.CategoryName,};
+        var category = _mapper.Map<Category>(newcategory);
          
          await _appDbContext.Category.AddAsync(category);
          await _appDbContext.SaveChangesAsync();
@@ -136,7 +130,7 @@ public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
         throw new ApplicationException("erorr ocurred when creat the  category ");
       }
     }
-    public async Task<Category> UpdateCategoryService(Guid id, CategoryDto UpdateCategoryDto)
+    public async Task<Category> UpdateCategoryService(Guid id, UpdateCategoryDto UpdateCategoryDto)
 {
     try
     {
@@ -146,9 +140,11 @@ public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
         {
             throw new ApplicationException("category not found.");
         }
-
-        existingcategory.CategoryName = UpdateCategoryDto.CategoryName ?? existingcategory.CategoryName;
-        existingcategory.Description = UpdateCategoryDto.Description ?? existingcategory.Description;
+            // BEFOR
+        // existingcategory.CategoryName = UpdateCategoryDto.CategoryName ?? existingcategory.CategoryName;
+        // existingcategory.Description = UpdateCategoryDto.Description ?? existingcategory.Description;
+        // AFTER
+        _mapper.Map(UpdateCategoryDto, existingcategory);
 
         _appDbContext.Category.Update(existingcategory);
         await _appDbContext.SaveChangesAsync();

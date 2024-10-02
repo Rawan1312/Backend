@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240930074122_UpdateDBConfig")]
+    partial class UpdateDBConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,7 +24,7 @@ namespace Backend.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Address", b =>
+            modelBuilder.Entity("AddressDto", b =>
                 {
                     b.Property<Guid>("AddressId")
                         .ValueGeneratedOnAdd()
@@ -42,91 +45,25 @@ namespace Backend.Migrations
                     b.ToTable("Address");
                 });
 
-            modelBuilder.Entity("Category", b =>
+            modelBuilder.Entity("CategoryDto", b =>
                 {
                     b.Property<Guid>("CategoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
-                    b.Property<string>("CategoryName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("CategoryId");
-
-                    b.ToTable("Category");
-                });
-
-            modelBuilder.Entity("Order", b =>
-                {
-                    b.Property<Guid>("OrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("NameOrder")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
+                    b.HasKey("CategoryId");
 
-                    b.HasKey("OrderId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("OrderDetail", b =>
-                {
-                    b.Property<Guid>("OrderDetailId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
-
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasMaxLength(200)
-                        .HasColumnType("numeric");
-
-                    b.HasKey("OrderDetailId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("OrderDetails");
-                });
-
-            modelBuilder.Entity("Payment", b =>
-                {
-                    b.Property<Guid>("PaymentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(29,18)");
-
-                    b.Property<string>("PaymentMethods")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("PaymentId");
-
-                    b.ToTable("Payments");
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("Product", b =>
@@ -152,36 +89,6 @@ namespace Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Product");
-                });
-
-            modelBuilder.Entity("Shipment", b =>
-                {
-                    b.Property<Guid>("ShipmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("ShipmentDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("ShipmentId");
-
-                    b.ToTable("Shipment");
-                });
-
-            modelBuilder.Entity("ShipmentDto", b =>
-                {
-                    b.Property<Guid>("ShipmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
-
-                    b.Property<DateTime>("ShipmentDate")
-                        .HasMaxLength(100)
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("ShipmentId");
-
-                    b.ToTable("ShipmentDto");
                 });
 
             modelBuilder.Entity("User", b =>
@@ -218,18 +125,6 @@ namespace Backend.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("OrderDetail", b =>
-                {
-                    b.HasOne("Order", null)
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("OrderId");
-                });
-
-            modelBuilder.Entity("Order", b =>
-                {
-                    b.Navigation("OrderDetails");
                 });
 #pragma warning restore 612, 618
         }
