@@ -9,9 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 public class ProductController : ControllerBase
 {
 
-  private readonly IProductService _productService;
+  private readonly ProductService _productService;
 
-  public ProductController(IProductService productService)
+  public ProductController(ProductService productService)
   {
     _productService = productService;
   }
