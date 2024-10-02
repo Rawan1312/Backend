@@ -15,12 +15,24 @@ public DbSet<Shipment> Shipment {get; set;}
           entity.HasKey(e=>e.UserId);
           entity.Property(e=>e.UserId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.Name).IsRequired().HasMaxLength(200);
-          entity.Property(e=>e.Email).IsRequired().IsUnicode(); 
+          entity.Property(e=>e.Email).IsRequired(); 
           entity.Property(e=>e.Password).IsRequired();
           entity.Property(e=>e.IsAdmin);
           entity.Property(e=>e.IsBanned);
           entity.Property(e=>e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
           });
+          modelBuilder.Entity<User>()
+            .HasMany(o => o.Order)
+            .WithOne(p => p.User)
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+            .HasMany(o => o.Payment)
+            .WithOne(p => p.User)
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
           modelBuilder.Entity<Product>(entity=>{
           entity.HasKey(e=>e.Id);
           entity.Property(e=>e.Id).HasDefaultValueSql("uuid_generate_v4()");

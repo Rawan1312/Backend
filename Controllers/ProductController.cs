@@ -43,13 +43,13 @@ public async Task<IActionResult> GetProductById(Guid ProId)
 {
     try
     {
-        var pro =await _productService.GetProductByIdService(ProId); 
+        var product =await _productService.GetProductByIdService(ProId); 
 
-        if (pro == null)
+        if (product == null)
         {
             return ApiResponse.NotFound("product not found" );
         }
-        return ApiResponse.Success(pro,"user is retuned succcessfuly");
+        return ApiResponse.Success(product,"user is retuned succcessfuly");
     }
     catch (ApplicationException ex)
     {
