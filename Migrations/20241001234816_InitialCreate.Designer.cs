@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240930171624_InitialCreate6")]
-    partial class InitialCreate6
+    [Migration("20241001234816_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -139,6 +139,9 @@ namespace Backend.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -161,20 +164,6 @@ namespace Backend.Migrations
                 {
                     b.Property<Guid>("ShipmentId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("ShipmentDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("ShipmentId");
-
-                    b.ToTable("Shipment");
-                });
-
-            modelBuilder.Entity("ShipmentDto", b =>
-                {
-                    b.Property<Guid>("ShipmentId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
@@ -184,7 +173,7 @@ namespace Backend.Migrations
 
                     b.HasKey("ShipmentId");
 
-                    b.ToTable("ShipmentDto");
+                    b.ToTable("Shipment");
                 });
 
             modelBuilder.Entity("User", b =>

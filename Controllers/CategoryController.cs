@@ -45,7 +45,7 @@ public async Task<IActionResult> GetCategoryById(Guid categoryId)
             return ApiResponse.NotFound( "category not found" );
         }
         
-        return ApiResponse.Success(category,"user is retuned succcessfuly");
+        return ApiResponse.Success(category,"category is retuned succcessfuly");
     }
     catch (ApplicationException ex)
     {
@@ -88,7 +88,7 @@ public async Task<IActionResult> DeleteCategory(Guid id)
         {
             var category = await _categoryservice.CreateCategoryService(newcategory);
             var response=new{Message="creat the Category",Category=category};
-        return ApiResponse.Created("user is created successfuly");
+        return ApiResponse.Created("category is created successfuly");
         }
         catch (ApplicationException ex)
         {

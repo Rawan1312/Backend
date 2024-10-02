@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 
 
 [ApiController]
-[Route("/api/products")]
+[Route("/api/v1/products")]
 
 public class ProductController : ControllerBase
 {
 
-  private readonly IProductService _productService;
+  private readonly ProductService _productService;
 
-  public ProductController(IProductService productService)
+  public ProductController(ProductService productService)
   {
     _productService = productService;
   }
@@ -43,13 +43,13 @@ public async Task<IActionResult> GetProductById(Guid ProId)
 {
     try
     {
-        var pro =await _productService.GetProductByIdService(ProId); 
+        var product =await _productService.GetProductByIdService(ProId); 
 
-        if (pro == null)
+        if (product == null)
         {
             return ApiResponse.NotFound("product not found" );
         }
-        return ApiResponse.Success(pro,"user is retuned succcessfuly");
+        return ApiResponse.Success(product,"user is retuned succcessfuly");
     }
     catch (ApplicationException ex)
     {
@@ -92,7 +92,7 @@ public async Task<IActionResult> DeleteProduct(Guid id)
         {
             var product = await _productService.CreateProductService(newproduct);
             var response=new{Message="creat the users",Product=product};
-        return ApiResponse.Created("user is created successfuly");
+        return ApiResponse.Created(product,"product is created successfully");
         }
         catch (ApplicationException ex)
         {

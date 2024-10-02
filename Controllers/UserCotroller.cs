@@ -6,7 +6,7 @@ using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/api/users")]
+[Route("/api/v1/users")]
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
@@ -45,7 +45,7 @@ public async Task<IActionResult> GetUserById(Guid userId)
             // cheng her
             return ApiResponse.NotFound( "User not found" );
         }
-        return ApiResponse.Success(user,"user is retuned succcessfuly");
+        return ApiResponse.Success("user is retuned succcessfuly");
     }
     catch (ApplicationException ex)
     {
@@ -68,7 +68,7 @@ public async Task<IActionResult> DeleteUser(Guid id)
         {
             return ApiResponse.NotFound($"User with this id {id}dose not exist" );
         }
-        return ApiResponse.Success(User,"user is deleted successfuly");
+        return ApiResponse.Success("user is deleted successfuly");
         
         }
     catch (ApplicationException ex)
@@ -113,7 +113,7 @@ public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUser updat
         {
             return ApiResponse.NotFound("User not found.");
         }
-        return ApiResponse.Success(updatedUser,"user is updated successfuly");
+        return ApiResponse.Success("user is updated successfuly");
     }
     catch (ApplicationException ex)
     {

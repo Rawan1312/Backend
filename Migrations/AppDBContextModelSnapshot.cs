@@ -136,6 +136,9 @@ namespace Backend.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -151,24 +154,12 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("Product");
                 });
 
             modelBuilder.Entity("Shipment", b =>
-                {
-                    b.Property<Guid>("ShipmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("ShipmentDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("ShipmentId");
-
-                    b.ToTable("Shipment");
-                });
-
-            modelBuilder.Entity("ShipmentDto", b =>
                 {
                     b.Property<Guid>("ShipmentId")
                         .ValueGeneratedOnAdd()
@@ -181,7 +172,7 @@ namespace Backend.Migrations
 
                     b.HasKey("ShipmentId");
 
-                    b.ToTable("ShipmentDto");
+                    b.ToTable("Shipment");
                 });
 
             modelBuilder.Entity("User", b =>
@@ -198,6 +189,7 @@ namespace Backend.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .IsUnicode(true)
                         .HasColumnType("text");
 
                     b.Property<bool>("IsAdmin")
@@ -225,6 +217,22 @@ namespace Backend.Migrations
                     b.HasOne("Order", null)
                         .WithMany("OrderDetails")
                         .HasForeignKey("OrderId");
+                });
+
+            modelBuilder.Entity("Product", b =>
+                {
+                    b.HasOne("Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Order", b =>
