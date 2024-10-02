@@ -10,6 +10,7 @@ public class User
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
          public List<Order> Order =new List<Order>();
          public List<Payment> Payment =new List<Payment>();
+         public List<Address> Address =new List<Address>();
 
 
     }
