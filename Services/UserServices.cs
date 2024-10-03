@@ -24,15 +24,15 @@ public UserService(AppDBContext appDbContext,IMapper mapper){
   _appDbContext=appDbContext;
 }     
 
-    public async Task<List<User>> GetAllUsersService()
-    {
-      try
-      {
-        var user= await _appDbContext.Users.ToListAsync();
-      return user;
-      }
-      catch (System.Exception)
-      {
+//     public async Task<List<User>> GetAllUsersService()
+//     {
+//       try
+//       {
+//         var user= await _appDbContext.Users.ToListAsync();
+//       return user;
+//       }
+//       catch (System.Exception)
+//       {
         
         throw new ApplicationException("erorr ocurred when get the data from the user table");
       }
@@ -49,21 +49,21 @@ public UserService(AppDBContext appDbContext,IMapper mapper){
       catch (System.Exception)
       {
         
-        throw new ApplicationException("erorr ocurred when creat the  user ");
-      }
-    }
+//         throw new ApplicationException("erorr ocurred when creat the  user ");
+//       }
+//     }
 
-    public async Task<UserDto?> GetUserByIdService(Guid userId)
-{
-    try
-    {
-        var user = await _appDbContext.Users
-            .FirstOrDefaultAsync(u => u.UserId == userId);
+//     public async Task<UserDto?> GetUserByIdService(Guid userId)
+// {
+//     try
+//     {
+//         var user = await _appDbContext.Users
+//             .FirstOrDefaultAsync(u => u.UserId == userId);
 
-        if (user == null)
-        {
-            return null; // Return null if user not found
-        }
+//         if (user == null)
+//         {
+//             return null; // Return null if user not found
+//         }
 
          return _mapper.Map<UserDto>(user);  
     }
@@ -78,25 +78,25 @@ public UserService(AppDBContext appDbContext,IMapper mapper){
     {
         var userToRemove = await _appDbContext.Users.FirstOrDefaultAsync(u => u.UserId == id);
 
-        if (userToRemove != null)
-        {
-            _appDbContext.Users.Remove(userToRemove);
-            await _appDbContext.SaveChangesAsync();
-            return true; 
-        }
-        return false; 
-    }
-    catch (Exception)
-    {
-        throw new ApplicationException("Error occurred while deleting the user.");
-    }
-}
+//         if (userToRemove != null)
+//         {
+//             _appDbContext.Users.Remove(userToRemove);
+//             await _appDbContext.SaveChangesAsync();
+//             return true; 
+//         }
+//         return false; 
+//     }
+//     catch (Exception)
+//     {
+//         throw new ApplicationException("Error occurred while deleting the user.");
+//     }
+// }
 
-    public async Task<User> UpdateUserService(Guid id, UpdateUser updateUser)
-{
-    try
-    {
-        var existingUser = await _appDbContext.Users.FindAsync(id);
+//     public async Task<User> UpdateUserService(Guid id, UpdateUser updateUser)
+// {
+//     try
+//     {
+//         var existingUser = await _appDbContext.Users.FindAsync(id);
 
         if (existingUser == null)
         {
@@ -108,14 +108,14 @@ public UserService(AppDBContext appDbContext,IMapper mapper){
         // existingUser.Password = updateUser.Password??existingUser.Password;
         _mapper.Map(updateUser, existingUser);
 
-        _appDbContext.Users.Update(existingUser);
-        await _appDbContext.SaveChangesAsync();
+//         _appDbContext.Users.Update(existingUser);
+//         await _appDbContext.SaveChangesAsync();
 
-        return existingUser;
-    }
-    catch (System.Exception)
-    {
-        throw new ApplicationException("Error occurred when updating the user.");
-    }
-}
-    }
+//         return existingUser;
+//     }
+//     catch (System.Exception)
+//     {
+//         throw new ApplicationException("Error occurred when updating the user.");
+//     }
+// }
+//     }

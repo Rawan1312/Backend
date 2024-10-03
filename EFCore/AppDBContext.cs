@@ -9,8 +9,9 @@ public DbSet<OrderDetail> OrderDetails {get;set;}
 public DbSet<Payment> Payments {get;set;}
 public DbSet<Address> Address {get; set;}
 public DbSet<Shipment> Shipment {get; set;}
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
+
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
         modelBuilder.Entity<User>(entity=>{
           entity.HasKey(e=>e.UserId);
           entity.Property(e=>e.UserId).HasDefaultValueSql("uuid_generate_v4()");
@@ -90,8 +91,32 @@ public DbSet<Shipment> Shipment {get; set;}
         
           });
 
+             
+        modelBuilder.Entity<User>()
+        .HasMany(adr => adr.Address)
+        .WhithOne(u => u.User)
+        .HasforeignKey(u => u.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
           modelBuilder.Entity<Shipment>(entity=>{
           entity.HasKey(e=>e.ShipmentId);
           entity.Property(e=>e.ShipmentId).HasDefaultValueSql("uuid_generate_v4()");
-          entity.Property(e=>e.ShipmentDate).IsRequired().HasMaxLength(100);});
-}}
+          entity.Property(e=>e.CompanyName).IsRequired().HasMaxLength(100);
+          entity.Property(e=>e.ShipmentDate).IsRequired().HasMaxLength(100);
+
+        
+          });
+
+          
+          
+        modelBuilder.Entity<Order>()
+        .HasOne<Shipment>(sh => sh.Shipment)
+        .WithOne(o => o.Order)
+        .HasForeignKey<Shipment>(o => o.OrderId)
+        .OnDelete(DeleteBehavior.Cascade);
+    
+        
+
+    }
+
+}
