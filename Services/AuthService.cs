@@ -29,8 +29,8 @@ using UserAuthenticationWebApi2.Models.Dtos;
                 Email = userRegisterDto.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(
                 userRegisterDto.Password),
-                Address = userRegisterDto.Address ?? string.Empty,
-                Image = userRegisterDto.Image ?? string.Empty,
+               // Address = userRegisterDto.Address ?? string.Empty,
+                
             };
              await _appDbContext.Users.AddAsync(user);
             await _appDbContext.SaveChangesAsync();
