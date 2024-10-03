@@ -9,8 +9,9 @@ public DbSet<OrderDetail> OrderDetails {get;set;}
 public DbSet<Payment> Payments {get;set;}
 public DbSet<Address> Address {get; set;}
 public DbSet<Shipment> Shipment {get; set;}
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
+
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
         modelBuilder.Entity<User>(entity=>{
           entity.HasKey(e=>e.UserId);
           entity.Property(e=>e.UserId).HasDefaultValueSql("uuid_generate_v4()");
@@ -23,14 +24,20 @@ public DbSet<Shipment> Shipment {get; set;}
           });
           modelBuilder.Entity<User>()
             .HasMany(o => o.Order)
-            .WithOne(p => p.User)
-            .HasForeignKey(p => p.UserId)
+            .WithOne(u => u.User)
+            .HasForeignKey(u => u.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
-            .HasMany(o => o.Payment)
-            .WithOne(p => p.User)
-            .HasForeignKey(p => p.UserId)
+            .HasMany(p => p.Payment)
+            .WithOne(u => u.User)
+            .HasForeignKey(u => u.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<User>()
+            .HasMany(adr => adr.Address)
+            .WithOne(u => u.User)
+            .HasForeignKey(u => u.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
           modelBuilder.Entity<Product>(entity=>{
@@ -41,19 +48,13 @@ public DbSet<Shipment> Shipment {get; set;}
           entity.Property(e=>e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
           });
           modelBuilder.Entity<Category>()
-            .HasMany(c => c.Products)
-            .WithOne(p => p.Category)
-            .HasForeignKey(p => p.CategoryId)
+            .HasMany(p => p.Products)
+            .WithOne(c => c.Category)
+            .HasForeignKey(c => c.CategoryId)
             // when you delete the category must be delete the product auto
             .OnDelete(DeleteBehavior.Cascade);
             
-            // ex:one-to-one
-            // modelBuilder.Entity<User>()
-            // .HasOne(c => c.Profile)
-            // .WithOne(p => p.user)
-            // .HasForeignKey(p => p.UserId)
-            // // when you delete the category must be delete the product auto
-            // .OnDelete(DeleteBehavior.Cascade);
+            
             
           modelBuilder.Entity<Category>(entity=>{
           entity.HasKey(e=>e.CategoryId);
@@ -90,8 +91,32 @@ public DbSet<Shipment> Shipment {get; set;}
         
           });
 
+             
+        
+
           modelBuilder.Entity<Shipment>(entity=>{
           entity.HasKey(e=>e.ShipmentId);
           entity.Property(e=>e.ShipmentId).HasDefaultValueSql("uuid_generate_v4()");
-          entity.Property(e=>e.ShipmentDate).IsRequired().HasMaxLength(100);});
-}}
+          entity.Property(e=>e.CompanyName).IsRequired().HasMaxLength(100);
+          entity.Property(e=>e.ShipmentDate).IsRequired().HasMaxLength(100);
+
+        
+          });
+
+          modelBuilder.Entity<Order>()
+          .HasOne<Shipment>(sh => sh.Shipment)
+          .WithOne(o => o.Order)
+          .HasForeignKey<Shipment>(o => o.OrderId)
+          .OnDelete(DeleteBehavior.Cascade);
+    
+        // ex:one-to-one
+            // modelBuilder.Entity<User>()
+            // .HasOne(c => c.Profile)
+            // .WithOne(p => p.user)
+            // .HasForeignKey(p => p.UserId)
+            // // when you delete the category must be delete the product auto
+            // .OnDelete(DeleteBehavior.Cascade);
+
+    }
+
+}
