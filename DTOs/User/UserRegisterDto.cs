@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace UserAuthenticationWebApi2.Models.Dtos
-{
     public class UserRegisterDto
     {
         public string Name { get; set; }
@@ -12,4 +10,3 @@ namespace UserAuthenticationWebApi2.Models.Dtos
         public string Password { get; set; }
        // public string? Address { get; set; }
     }
-}

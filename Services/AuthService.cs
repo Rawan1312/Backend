@@ -8,20 +8,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using UserAuthenticationWebApi2.Data;
-using UserAuthenticationWebApi2.Models;
-using UserAuthenticationWebApi2.Models.Dtos;
 
      public class AuthService {
- private readonly AppDbContext _appDbContext;
+ private readonly AppDBContext _appDbContext;
         private readonly IConfiguration _configuration;
 
-        public AuthService(AppDbContext appDbContext, IConfiguration configuration)
+        public AuthService(AppDBContext appDbContext, IConfiguration configuration)
         {
             _appDbContext = appDbContext;
             _configuration = configuration; }
             
-            public async Task<string> RegisterUserService(UserRegisterDto userRegisterDto)
+            public async Task<string> RegisterUserService(User userRegisterDto)
         {
             var user = new User
             {

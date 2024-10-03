@@ -9,4 +9,8 @@ public Guid CustomerId{get;set;}
 
 public decimal Price{get;set;}
 
+public Guid ShipmentId {set; get;}
+
+public Shipment Shipment {set; get;}
+
 }

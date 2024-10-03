@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using UserAuthenticationWebApi2.Models.Dtos;
-using UserAuthenticationWebApi2.Services;
 
-// namespace UserAuthenticationWebApi2.Controllers
-{
     [ApiController]
     [Route("/api/auth")]
     public class AuthController : ControllerBase
@@ -32,4 +28,3 @@ using UserAuthenticationWebApi2.Services;
             return Created("", new { Token = token });
         }
     }
-}

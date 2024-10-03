@@ -3,22 +3,25 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using UserAuthenticationWebApi2.Data;
-using UserAuthenticationWebApi2.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddControllers();
+
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<OrderDetailService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<OrderService>();
-builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<ShipmentService>(); 
+
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+    var Configuration = builder.Configuration;
 
     var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"]);
 builder.Services.AddAuthentication(options =>
@@ -72,10 +75,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 var app = builder.Build();
-
-// app.UseHttpsRedirection();
-
-app.MapGet("/",()=>"hello");
+ app.UseHttpsRedirection();
 
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
@@ -86,8 +86,7 @@ app.MapGet("/",()=>"hello");
 
 // app.UseHttpsRedirection();
 
-
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
