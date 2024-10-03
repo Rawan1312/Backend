@@ -1,10 +1,9 @@
-using System;
+using System; 
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-
 public interface ICategoryService{
     Task<List<Category>> GetAllCategoryService();
     Task<CategoryDto?> GetCategoryByIdService(Guid categoryId);
@@ -14,13 +13,11 @@ public interface ICategoryService{
     }
 public class CategoryService
   {
-
     private readonly AppDBContext _appDbContext;
     private readonly IMapper _mapper;
 public CategoryService(AppDBContext appDbContext,IMapper mapper){
     _mapper = mapper;
-  _appDbContext=appDbContext;
-}
+  _appDbContext=appDbContext;}
       
 // public class PaginatedResult<T>
 // {
@@ -81,7 +78,6 @@ public CategoryService(AppDBContext appDbContext,IMapper mapper){
     {
         var category = await _appDbContext.Category
             .FirstOrDefaultAsync(u => u.CategoryId == categoryId);
-
         if (category == null)
         {
             return null; 
@@ -148,12 +144,9 @@ public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
 
         _appDbContext.Category.Update(existingcategory);
         await _appDbContext.SaveChangesAsync();
-
-        return existingcategory;
-    }
+        return existingcategory;}
     catch (System.Exception)
     {
         throw new ApplicationException("Error occurred when updating the category.");
     }
-}
-}
+}}
