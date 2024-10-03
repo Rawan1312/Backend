@@ -1,32 +1,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 
 [ApiController]
 [Route("/api/v1/users")]
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
-    public UserController(UserService userService)
+    private readonly AuthService _authService;
+    public UserController(UserService userService,AuthService authService)
     {
-        _userService = userService;
+         _userService = userService;
+        _authService = authService;
     }
-     private readonly AuthService _authService;
-        public UserController(AuthService authService)
-        {
-            _authService = authService;
-    //     }
-         [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("profile")]
-        public IActionResult GetUserProfile()
+         public IActionResult GetUserProfile()
         {
             return Ok("user data is returned");
         }
-        }
+        
 
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
@@ -136,6 +135,4 @@ public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUser updat
     {
          return ApiResponse.ServerError("server error:"+ ex.Message);
     }
-}  
-
-}
+}  }

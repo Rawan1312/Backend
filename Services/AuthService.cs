@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-     public class AuthService {
+public class AuthService {
  private readonly AppDBContext _appDbContext;
         private readonly IConfiguration _configuration;
 
@@ -18,7 +18,7 @@ using Microsoft.IdentityModel.Tokens;
             _appDbContext = appDbContext;
             _configuration = configuration; }
             
-            public async Task<string> RegisterUserService(User userRegisterDto)
+            public async Task<string> RegisterUserService(UserRegisterDto userRegisterDto)
         {
             var user = new User
             {
@@ -34,6 +34,7 @@ using Microsoft.IdentityModel.Tokens;
             await _appDbContext.SaveChangesAsync();
 
             return "user is created successfully"; }
+            
              public async Task<string> LoginService(UserLoginDto userLoginDto)
         {
             var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Email == userLoginDto.Email);
@@ -85,9 +86,4 @@ using Microsoft.IdentityModel.Tokens;
 
             // Serialize the token to a JWT string.
             return tokenHandler.WriteToken(token);
-        }
-
-
-    }
-            
-            
+        }}

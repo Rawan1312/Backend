@@ -27,7 +27,7 @@ public AddressService(AppDBContext appDbContext , IMapper mapper ){
     // Make sure
       GetAllAddressService() {
       try{
-        var address= await _appDbContext.Address.ToListAsync.Include(u => u.User)();
+        var address= await _appDbContext.Address.ToListAsync();
       return address; // make sure
       }
        catch (System.Exception)
@@ -130,5 +130,4 @@ public AddressService(AppDBContext appDbContext , IMapper mapper ){
     {
         throw new ApplicationException("Error occurred when updating the address.");
     }
-} }
-   
+}}
