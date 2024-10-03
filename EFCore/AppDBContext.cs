@@ -74,6 +74,19 @@ public DbSet<Shipment> Shipment {get; set;}
 
         
           });
+          
+          
+        modelBuilder.Entity<User>()
+        .HasMany(adr => adr.Address)
+        .WhithOne(u => u.User)
+        .HasforeignKey(u => u.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+    
+         modelBuilder.Entity<Order>()
+        .HasOne(sh => sh.Shipment)
+        .WhithOne(o => o.Order)
+        .HasforeignKey(o => o.OrderId)
+        .OnDelete(DeleteBehavior.Cascade);
     }
 
 }

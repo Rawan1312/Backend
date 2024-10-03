@@ -27,7 +27,7 @@ public class AddressController : ControllerBase
         {
             var address = await _addressService.GetAllAddressService();
          //   var response=new{Message="return all the address",Address=address};
-        return ApiResponse.Success(address,"Return Address is successfly ");
+        return ApiResponse.Success(address,"Return Address is succesfully ");
         }
         catch (ApplicationException ex)
         {

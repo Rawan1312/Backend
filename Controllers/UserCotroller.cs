@@ -13,6 +13,18 @@ public class UserController : ControllerBase
     {
         _userService = userService;
     }
+    //  private readonly AuthService _authService;
+    //     public UserController(AuthService authService)
+    //     {
+    //         _authService = authService;
+    // //     }
+    //      [Authorize(Roles = "Admin")]
+    //     [HttpGet("profile")]
+    //     public IActionResult GetUserProfile()
+    //     {
+    //         return Ok("user data is returned");
+    //     }
+
 
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
@@ -125,4 +137,5 @@ public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUser updat
         return StatusCode(500, ex.Message);
     }
 }  
+
 }
