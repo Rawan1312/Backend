@@ -1,8 +1,17 @@
+<<<<<<< HEAD
 // using System;
 // using System.Collections.Generic;
 // using System.Linq;
 // using System.Threading.Tasks;
 // using Microsoft.EntityFrameworkCore;
+=======
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+>>>>>>> fa5417deb5e4259df94541f550079249b933152f
 
 // public interface ICategoryService{
 //     Task<List<Category>> GetAllCategoryService();
@@ -14,10 +23,19 @@
 // public class CategoryService
 //   {
 
+<<<<<<< HEAD
 //     private readonly AppDBContext _appDbContext;
 // public CategoryService(AppDBContext appDbContext){
 //   _appDbContext=appDbContext;
 // }
+=======
+    private readonly AppDBContext _appDbContext;
+    private readonly IMapper _mapper;
+public CategoryService(AppDBContext appDbContext,IMapper mapper){
+    _mapper = mapper;
+  _appDbContext=appDbContext;
+}
+>>>>>>> fa5417deb5e4259df94541f550079249b933152f
       
 // // public class PaginatedResult<T>
 // // {
@@ -92,6 +110,7 @@
 //             // Map other properties as needed
 //         };
 
+<<<<<<< HEAD
 //         return CategoryDto;
 //     }
 //     catch (Exception)
@@ -125,6 +144,45 @@
 //         var category = new Category {
 //           CategoryId=newcategory.CategoryId,
 //           CategoryName = newcategory.CategoryName,};
+=======
+        if (category == null)
+        {
+            return null; 
+        }
+ 
+
+        return _mapper.Map<CategoryDto>(category);
+    }
+    catch (Exception)
+    {
+        throw new ApplicationException("Error occurred while retrieving the category.");
+    }
+}
+     public async Task<bool> DeleteCategoryByIdService(Guid id)
+{
+    try
+    {
+        var categoryToRemove = await _appDbContext.Category.FirstOrDefaultAsync(u => u.CategoryId == id);
+
+        if (categoryToRemove != null)
+        {
+            _appDbContext.Category.Remove(categoryToRemove);
+            await _appDbContext.SaveChangesAsync();
+            return true; 
+        }
+        return false; 
+    }
+    catch (Exception)
+    {
+        throw new ApplicationException("Error occurred while deleting the category.");
+    }
+}
+public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
+    {
+      try
+      {
+        var category = _mapper.Map<Category>(newcategory);
+>>>>>>> fa5417deb5e4259df94541f550079249b933152f
          
 //          await _appDbContext.Category.AddAsync(category);
 //          await _appDbContext.SaveChangesAsync();
@@ -133,6 +191,7 @@
 //       catch (System.Exception)
 //       {
         
+<<<<<<< HEAD
 //         throw new ApplicationException("erorr ocurred when creat the  category ");
 //       }
 //     }
@@ -149,10 +208,31 @@
 
 //         existingcategory.CategoryName = UpdateCategoryDto.CategoryName ?? existingcategory.CategoryName;
 //         existingcategory.Description = UpdateCategoryDto.Description ?? existingcategory.Description;
+=======
+        throw new ApplicationException("erorr ocurred when creat the  category ");
+      }
+    }
+    public async Task<Category> UpdateCategoryService(Guid id, UpdateCategoryDto UpdateCategoryDto)
+{
+    try
+    {
+        var existingcategory = await _appDbContext.Category.FindAsync(id);
+
+        if (existingcategory == null)
+        {
+            throw new ApplicationException("category not found.");
+        }
+            // BEFOR
+        // existingcategory.CategoryName = UpdateCategoryDto.CategoryName ?? existingcategory.CategoryName;
+        // existingcategory.Description = UpdateCategoryDto.Description ?? existingcategory.Description;
+        // AFTER
+        _mapper.Map(UpdateCategoryDto, existingcategory);
+>>>>>>> fa5417deb5e4259df94541f550079249b933152f
 
 //         _appDbContext.Category.Update(existingcategory);
 //         await _appDbContext.SaveChangesAsync();
 
+<<<<<<< HEAD
 //         return existingcategory;
 //     }
 //     catch (System.Exception)
@@ -161,3 +241,13 @@
 //     }
 // }
 // }
+=======
+        return existingcategory;
+    }
+    catch (System.Exception)
+    {
+        throw new ApplicationException("Error occurred when updating the category.");
+    }
+}
+}
+>>>>>>> fa5417deb5e4259df94541f550079249b933152f
