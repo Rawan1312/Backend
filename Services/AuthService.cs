@@ -12,13 +12,14 @@ using UserAuthenticationWebApi2.Data;
 using UserAuthenticationWebApi2.Models;
 using UserAuthenticationWebApi2.Models.Dtos;
 
+     public class AuthService {
  private readonly AppDbContext _appDbContext;
         private readonly IConfiguration _configuration;
 
         public AuthService(AppDbContext appDbContext, IConfiguration configuration)
         {
             _appDbContext = appDbContext;
-            _configuration = configuration; 
+            _configuration = configuration; }
             
             public async Task<string> RegisterUserService(UserRegisterDto userRegisterDto)
         {
@@ -35,7 +36,7 @@ using UserAuthenticationWebApi2.Models.Dtos;
              await _appDbContext.Users.AddAsync(user);
             await _appDbContext.SaveChangesAsync();
 
-            return "user is created successfully";
+            return "user is created successfully"; }
              public async Task<string> LoginService(UserLoginDto userLoginDto)
         {
             var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Email == userLoginDto.Email);
@@ -92,4 +93,4 @@ using UserAuthenticationWebApi2.Models.Dtos;
 
     }
             
-            }
+            
