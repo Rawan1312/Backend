@@ -28,7 +28,7 @@ public DbSet<Shipment> Shipment {get; set;}
             .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
-            .HasMany(o => o.Payment)
+            .HasMany(o => o.Order)
             .WithOne(p => p.User)
             .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.Cascade);
