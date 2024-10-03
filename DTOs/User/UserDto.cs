@@ -6,5 +6,6 @@ public class UserDto
         public bool IsAdmin { get; set; } = false;
         public bool IsBanned { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        
 
     }

@@ -23,9 +23,7 @@ public AddressService(AppDBContext appDbContext , IMapper mapper ){
   _appDbContext=appDbContext; 
   _mapper = mapper ; 
 }
-    public async Task<List<Address>>
-    // Make sure
-      GetAllAddressService() {
+    public async Task<List<Address>> GetAllAddressService() {
       try{
         var address= await _appDbContext.Address.Include(u => u.User).ToListAsync();
       return address;// make sure
