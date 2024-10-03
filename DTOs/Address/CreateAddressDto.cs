@@ -19,5 +19,6 @@ public class CreateAddressDto{
          [Required(ErrorMessage = "State is missing.")]
         [StringLength(50, ErrorMessage  = "State must be between 3 and 50 characters.", MinimumLength = 3)]
                public required string State { get; set; }
+               public Guid UserId { get; set; }
     
 }

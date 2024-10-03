@@ -5,38 +5,30 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddControllers();
-builder.Services.AddControllers();
-builder.Services.AddControllers();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ProductService>();
-
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<OrderDetailService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<OrderService>();
-
 builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<ShipmentService>(); 
-
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-    var Configuration = builder.Configuration;
-
-    var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"]);
-builder.Services.AddAuthentication(options =>
+    
+    builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
+    var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
@@ -45,8 +37,8 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(key),
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidIssuer = Configuration["Jwt:Issuer"],
-        ValidAudience = Configuration["Jwt:Audience"],
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
         ClockSkew = TimeSpan.Zero
     };
 });
@@ -81,7 +73,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 var app = builder.Build();
- app.UseHttpsRedirection();
+//  app.UseHttpsRedirection();
 
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
@@ -90,7 +82,7 @@ var app = builder.Build();
 //     app.UseSwaggerUI();
 // }
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -6,7 +6,7 @@ using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/api/Address")]
+[Route("/api/v1/Address")]
 public class AddressController : ControllerBase
 {
     private readonly AddressService _addressService;

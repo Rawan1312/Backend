@@ -27,21 +27,14 @@ public AddressService(AppDBContext appDbContext , IMapper mapper ){
     // Make sure
       GetAllAddressService() {
       try{
-        var address= await _appDbContext.Address.ToListAsync();
-      return address; // make sure
+        var address= await _appDbContext.Address.Include(u => u.User).ToListAsync();
+      return address;// make sure
       }
        catch (System.Exception)
       {
         
         throw new ApplicationException("erorr ocurred when get the data from the address table");
-      }
-    } 
-      
-    //public List<AddressDto> GetAllAddressService()
-    //{
-    ///  return _Address;
-    //}
-
+      }}
     public async Task<AddressDto?> GetAddresssByIdService(Guid id)
     {
       try{
