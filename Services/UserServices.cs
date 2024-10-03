@@ -1,24 +1,28 @@
-// using System;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System.Linq.Expressions;
-// using System.Threading.Tasks;
-// using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using AutoMapper;
+
+using Microsoft.EntityFrameworkCore;
 
 
-// public interface IUserService{
-//     Task<List<User>> GetAllUsersService();
-//     Task<User> CreateUserService(CreateUserDto newuser);
-//     Task<UserDto?> GetUserByIdService(Guid userId);
-//     Task<bool> DeleteUserByIdService(Guid id);
-//     Task<User> UpdateUserService(Guid id, UpdateUser updateUser);
-// }
-// public class UserService
-//   {
-// private readonly AppDBContext _appDbContext;
-// public UserService(AppDBContext appDbContext){
-//   _appDbContext=appDbContext;
-// }      
+public interface IUserService{
+    Task<List<User>> GetAllUsersService();
+    Task<User> CreateUserService(CreateUserDto newuser);
+    Task<UserDto?> GetUserByIdService(Guid userId);
+    Task<bool> DeleteUserByIdService(Guid id);
+    Task<User> UpdateUserService(Guid id, UpdateUser updateUser);
+}
+public class UserService:IUserService
+  {
+private readonly AppDBContext _appDbContext;
+private readonly IMapper _mapper;
+public UserService(AppDBContext appDbContext,IMapper mapper){
+    _mapper = mapper;
+  _appDbContext=appDbContext;
+}     
 
 //     public async Task<List<User>> GetAllUsersService()
 //     {
@@ -30,23 +34,20 @@
 //       catch (System.Exception)
 //       {
         
-//         throw new ApplicationException("erorr ocurred when get the data from the user table");
-//       }
-//     }
-//     public async Task<User> CreateUserService(CreateUserDto newuser)
-//     {
-//       try
-//       {
-//         var user = new User {
-//           Name=newuser.Name,
-//           Email = newuser.Email,
-//          Password = newuser.Password};
-//          await _appDbContext.Users.AddAsync(user);
-//          await _appDbContext.SaveChangesAsync();
-//          return user;
-//       }
-//       catch (System.Exception)
-//       {
+        throw new ApplicationException("erorr ocurred when get the data from the user table");
+      }
+    }
+    public async Task<User> CreateUserService(CreateUserDto newuser)
+    {
+      try
+      {
+        var user = _mapper.Map<User>(newuser);
+         await _appDbContext.Users.AddAsync(user);
+         await _appDbContext.SaveChangesAsync();
+         return user;
+      }
+      catch (System.Exception)
+      {
         
 //         throw new ApplicationException("erorr ocurred when creat the  user ");
 //       }
@@ -64,27 +65,18 @@
 //             return null; // Return null if user not found
 //         }
 
-//         // Convert User to UserDto if needed
-//         var userDto = new UserDto
-//         {
-//             UserId = user.UserId,
-//             Name = user.Name,
-//             Email = user.Email,
-//             // Map other properties as needed
-//         };
-
-//         return userDto;
-//     }
-//     catch (Exception)
-//     {
-//         throw new ApplicationException("Error occurred while retrieving the user.");
-//     }
-// }
-//    public async Task<bool> DeleteUserByIdService(Guid id)
-// {
-//     try
-//     {
-//         var userToRemove = await _appDbContext.Users.FirstOrDefaultAsync(u => u.UserId == id);
+         return _mapper.Map<UserDto>(user);  
+    }
+    catch (Exception)
+    {
+        throw new ApplicationException("Error occurred while retrieving the user.");
+    }
+}
+   public async Task<bool> DeleteUserByIdService(Guid id)
+{
+    try
+    {
+        var userToRemove = await _appDbContext.Users.FirstOrDefaultAsync(u => u.UserId == id);
 
 //         if (userToRemove != null)
 //         {
@@ -106,14 +98,15 @@
 //     {
 //         var existingUser = await _appDbContext.Users.FindAsync(id);
 
-//         if (existingUser == null)
-//         {
-//             throw new ApplicationException("User not found.");
-//         }
+        if (existingUser == null)
+        {
+            return null;
+        }
 
-//         existingUser.Name = updateUser.Name ?? existingUser.Name;
-//         existingUser.Email = updateUser.Email ?? existingUser.Email;
-//         existingUser.Password = updateUser.Password ?? existingUser.Password;
+        // existingUser.Name = updateUser.Name ?? existingUser.Name;
+        // existingUser.Email = updateUser.Email ?? existingUser.Email;
+        // existingUser.Password = updateUser.Password??existingUser.Password;
+        _mapper.Map(updateUser, existingUser);
 
 //         _appDbContext.Users.Update(existingUser);
 //         await _appDbContext.SaveChangesAsync();

@@ -14,6 +14,20 @@ namespace ecommerce_db_api.Mappers
     {
         public MappingProfile()
         {
+            CreateMap<UserDto,User>();
+            CreateMap<CreateUserDto, User>();
+            CreateMap<UpdateUser, User>();
+
+
+            CreateMap<CreateCategoryDto, Category>();
+            CreateMap<UpdateCategoryDto, Category>();
+            CreateMap<Category, CategoryDto>().ReverseMap();
+
+
+        CreateMap<ProductDto,Product >();
+         CreateMap<UpdateProductDto, Product>();
+        CreateMap<CreateProductDto, Product>();
+
 
                       //Address Maps
             CreateMap<CreateAddressDto, Address>();
@@ -24,6 +38,6 @@ namespace ecommerce_db_api.Mappers
               CreateMap<Shipment, ShipmentDto?>();//??GeyByID
               CreateMap<UpdateShipment, Shipment>();
 
-        }
+        
     }
 }

@@ -182,33 +182,14 @@ public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
       try
       {
         var category = _mapper.Map<Category>(newcategory);
->>>>>>> fa5417deb5e4259df94541f550079249b933152f
          
-//          await _appDbContext.Category.AddAsync(category);
-//          await _appDbContext.SaveChangesAsync();
-//          return category;
-//       }
-//       catch (System.Exception)
-//       {
+         await _appDbContext.Category.AddAsync(category);
+         await _appDbContext.SaveChangesAsync();
+         return category;
+      }
+      catch (System.Exception)
+      {
         
-<<<<<<< HEAD
-//         throw new ApplicationException("erorr ocurred when creat the  category ");
-//       }
-//     }
-//     public async Task<Category> UpdateCategoryService(Guid id, CategoryDto UpdateCategoryDto)
-// {
-//     try
-//     {
-//         var existingcategory = await _appDbContext.Category.FindAsync(id);
-
-//         if (existingcategory == null)
-//         {
-//             throw new ApplicationException("category not found.");
-//         }
-
-//         existingcategory.CategoryName = UpdateCategoryDto.CategoryName ?? existingcategory.CategoryName;
-//         existingcategory.Description = UpdateCategoryDto.Description ?? existingcategory.Description;
-=======
         throw new ApplicationException("erorr ocurred when creat the  category ");
       }
     }
@@ -227,10 +208,9 @@ public async Task<Category> CreateCategoryService(CreateCategoryDto newcategory)
         // existingcategory.Description = UpdateCategoryDto.Description ?? existingcategory.Description;
         // AFTER
         _mapper.Map(UpdateCategoryDto, existingcategory);
->>>>>>> fa5417deb5e4259df94541f550079249b933152f
 
-//         _appDbContext.Category.Update(existingcategory);
-//         await _appDbContext.SaveChangesAsync();
+        _appDbContext.Category.Update(existingcategory);
+        await _appDbContext.SaveChangesAsync();
 
 <<<<<<< HEAD
 //         return existingcategory;

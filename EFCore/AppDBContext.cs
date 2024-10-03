@@ -8,8 +8,6 @@ public DbSet<Order> Orders{get;set;}
 public DbSet<OrderDetail> OrderDetails {get;set;}
 public DbSet<Payment> Payments {get;set;}
 public DbSet<Address> Address {get; set;}
-public DbSet<Payment> payments {get;set;}
-
 public DbSet<Shipment> Shipment {get; set;}
 
 protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -19,12 +17,23 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
           entity.Property(e=>e.UserId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.Name).IsRequired().HasMaxLength(200);
           entity.Property(e=>e.Email).IsRequired(); 
-        //   entity.Property(e=>e.Email).IsUnique();
           entity.Property(e=>e.Password).IsRequired();
           entity.Property(e=>e.IsAdmin);
           entity.Property(e=>e.IsBanned);
           entity.Property(e=>e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
           });
+          modelBuilder.Entity<User>()
+            .HasMany(o => o.Order)
+            .WithOne(p => p.User)
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+            .HasMany(o => o.Payment)
+            .WithOne(p => p.User)
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
           modelBuilder.Entity<Product>(entity=>{
           entity.HasKey(e=>e.Id);
           entity.Property(e=>e.Id).HasDefaultValueSql("uuid_generate_v4()");
@@ -32,11 +41,26 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
           entity.Property(e=>e.Price).IsRequired();
           entity.Property(e=>e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
           });
+          modelBuilder.Entity<Category>()
+            .HasMany(c => c.Products)
+            .WithOne(p => p.Category)
+            .HasForeignKey(p => p.CategoryId)
+            // when you delete the category must be delete the product auto
+            .OnDelete(DeleteBehavior.Cascade);
+            
+            // ex:one-to-one
+            // modelBuilder.Entity<User>()
+            // .HasOne(c => c.Profile)
+            // .WithOne(p => p.user)
+            // .HasForeignKey(p => p.UserId)
+            // // when you delete the category must be delete the product auto
+            // .OnDelete(DeleteBehavior.Cascade);
+            
           modelBuilder.Entity<Category>(entity=>{
           entity.HasKey(e=>e.CategoryId);
           entity.Property(e=>e.CategoryId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.CategoryName).IsRequired().HasMaxLength(200);
-          entity.Property(e=>e.Description);
+          entity.Property(e=>e.Description);});
           
           modelBuilder.Entity<Order>(entity=>{
           entity.HasKey(e=>e.OrderId);
@@ -57,7 +81,7 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
           entity.Property(e=>e.Amount).IsRequired().HasColumnType("decimal(29,18)");
           entity.Property(e => e.PaymentMethods).IsRequired() .HasConversion<string>();
             });
-          });
+          
 
            modelBuilder.Entity<Address>(entity=>{
           entity.HasKey(e=>e.AddressId);
@@ -67,7 +91,14 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
         
           });
 
-          modelBuilder.Entity<ShipmentDto>(entity=>{
+             
+        modelBuilder.Entity<User>()
+        .HasMany(adr => adr.Address)
+        .WhithOne(u => u.User)
+        .HasforeignKey(u => u.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+          modelBuilder.Entity<Shipment>(entity=>{
           entity.HasKey(e=>e.ShipmentId);
           entity.Property(e=>e.ShipmentId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.CompanyName).IsRequired().HasMaxLength(100);
@@ -75,19 +106,16 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
 
         
           });
+
           
           
-        // modelBuilder.Entity<User>()
-        // .HasMany(adr => adr.Address)
-        // .WhithOne(u => u.User)
-        // .HasforeignKey(u => u.UserId)
-        // .OnDelete(DeleteBehavior.Cascade);
-    
-         modelBuilder.Entity<Order>()
+        modelBuilder.Entity<Order>()
         .HasOne<Shipment>(sh => sh.Shipment)
         .WithOne(o => o.Order)
         .HasForeignKey<Shipment>(o => o.OrderId)
         .OnDelete(DeleteBehavior.Cascade);
+    
+        
 
     }
 

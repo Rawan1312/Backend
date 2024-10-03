@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -17,9 +18,11 @@ public interface IProductService{
 public class ProductService:IProductService
 {
     private readonly AppDBContext _appDbContext;
-public ProductService(AppDBContext appDbContext){
+private readonly IMapper _mapper;
+public ProductService(AppDBContext appDbContext,IMapper mapper){
+    _mapper = mapper;
   _appDbContext=appDbContext;
-}
+}     
     
 //     public class PaginatedResult<T>
 // {
@@ -92,15 +95,9 @@ public async Task<ProductDto?> GetProductByIdService(Guid Id)
         }
 
         // Convert product to productDto if needed
-        var productDto = new ProductDto
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Price = product.Price,
-            // Map other properties as needed
-        };
+        return _mapper.Map<ProductDto>(product);
 
-        return productDto;
+        
     }
     catch (Exception)
     {
@@ -132,9 +129,7 @@ public async Task<Product> CreateProductService(CreateProductDto newproduct)
     {
       try
       {
-        var product = new Product {
-          Name=newproduct.Name,
-          Price = newproduct.Price,};
+        var product = _mapper.Map<Product>(newproduct);
          await _appDbContext.Product.AddAsync(product);
          await _appDbContext.SaveChangesAsync();
          return product;
@@ -156,8 +151,9 @@ public async Task<Product> CreateProductService(CreateProductDto newproduct)
             throw new ApplicationException("Product not found.");
         }
 
-        existingProduct.Name = updateProduct.Name ?? existingProduct.Name;
-        existingProduct.Price = updateProduct.Price ?? existingProduct.Price;
+        // existingProduct.Name = updateProduct.Name ?? existingProduct.Name;
+        // existingProduct.Price = updateProduct.Price ?? existingProduct.Price;
+        _mapper.Map(updateProduct,existingProduct);
         
 
         _appDbContext.Product.Update(existingProduct);
