@@ -24,7 +24,7 @@ public OrderService(AppDBContext appDbContext){
     {
       try
       {
-        var order= await _appDbContext.Orders.ToListAsync();
+        var order= await _appDbContext.Orders.Include(u => u.User).ToListAsync();
       return order;
       }
       catch (System.Exception)

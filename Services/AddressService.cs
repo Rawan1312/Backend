@@ -23,25 +23,17 @@ public AddressService(AppDBContext appDbContext , IMapper mapper ){
   _appDbContext=appDbContext; 
   _mapper = mapper ; 
 }
-    public async Task<List<Address>>
-    // Make sure
-      GetAllAddressService() {
+    public async Task<List<AddressDto>> GetAllAddressService() {
       try{
-        var address= await _appDbContext.Address.ToListAsync.Include(u => u.User)();
-      return address; // make sure
+        var address= await _appDbContext.Address.Include(u => u.User).ToListAsync();
+      var addressDtos = _mapper.Map<List<AddressDto>>(address);
+        return addressDtos;
       }
        catch (System.Exception)
       {
         
         throw new ApplicationException("erorr ocurred when get the data from the address table");
-      }
-    } 
-      
-    //public List<AddressDto> GetAllAddressService()
-    //{
-    ///  return _Address;
-    //}
-
+      }}
     public async Task<AddressDto?> GetAddresssByIdService(Guid id)
     {
       try{
@@ -130,5 +122,4 @@ public AddressService(AppDBContext appDbContext , IMapper mapper ){
     {
         throw new ApplicationException("Error occurred when updating the address.");
     }
-} }
-   
+}}

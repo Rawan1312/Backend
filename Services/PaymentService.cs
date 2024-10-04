@@ -19,7 +19,7 @@ public PaymentService(AppDBContext appDbContext){
     {
       try
       {
-        var payment= await _appDbContext.Payments.ToListAsync();
+        var payment= await _appDbContext.Payments.Include(u => u.User).ToListAsync();
       return payment;
       }
       catch (System.Exception)

@@ -16,6 +16,7 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
           entity.HasKey(e=>e.UserId);
           entity.Property(e=>e.UserId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.Name).IsRequired().HasMaxLength(200);
+          entity.HasIndex(e => e.Name).IsUnique();
           entity.Property(e=>e.Email).IsRequired(); 
           entity.Property(e=>e.Password).IsRequired();
           entity.Property(e=>e.IsAdmin);
@@ -44,6 +45,7 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
           entity.HasKey(e=>e.Id);
           entity.Property(e=>e.Id).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.Name).IsRequired().HasMaxLength(200);
+          entity.HasIndex(e => e.Name).IsUnique();
           entity.Property(e=>e.Price).IsRequired();
           entity.Property(e=>e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
           });
@@ -60,12 +62,14 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
           entity.HasKey(e=>e.CategoryId);
           entity.Property(e=>e.CategoryId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.CategoryName).IsRequired().HasMaxLength(200);
+          entity.HasIndex(e => e.CategoryName).IsUnique();
           entity.Property(e=>e.Description);});
           
           modelBuilder.Entity<Order>(entity=>{
           entity.HasKey(e=>e.OrderId);
           entity.Property(e=>e.OrderId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.NameOrder).IsRequired().HasMaxLength(200);
+          entity.HasIndex(e => e.NameOrder).IsUnique();
           // entity.HasMany(e=>e.OrderDetails).WithOne();
           entity.Property(e=>e.Price);
           });

@@ -66,7 +66,7 @@ public ProductService(AppDBContext appDbContext,IMapper mapper){
 {
     try
     {
-        var products = await _appDbContext.Product.ToListAsync();
+        var products = await _appDbContext.Product.Include(c => c.Category).ToListAsync();
         
         var productDtos = products.Select(p => new ProductDto
         {
