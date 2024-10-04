@@ -3,6 +3,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Diagnostics;
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -17,6 +19,8 @@ builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<ShipmentService>(); 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -73,17 +77,34 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 var app = builder.Build();
-//  app.UseHttpsRedirection();
+
 
 // Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseSwagger();
-//     app.UseSwaggerUI();
-// }
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+app.Use(async (context, next) =>
+{
+    var clientIp = context.Connection.RemoteIpAddress?.ToString();
+    var stopwatch = Stopwatch.StartNew();
+    Console.WriteLine($"[{DateTime.UtcNow}] [Request] " +
+                      $"{context.Request.Method} {context.Request.Path}{context.Request.QueryString} " +
+                      $"from {clientIp}");
 
+    await next.Invoke();
+    stopwatch.Stop();
+    Console.WriteLine($"Time Taken: {stopwatch.ElapsedMilliseconds}");
+});
+
+app.MapGet("/", () =>
+{
+    return "hello I am lazy today";
+});
+
+app.UseRouting();
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
