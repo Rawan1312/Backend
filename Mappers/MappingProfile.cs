@@ -43,6 +43,14 @@ namespace ecommerce_db_api.Mappers
               CreateMap<Order, OrderDto>().ReverseMap();
               CreateMap<UpdateOrderDto, Order>();
 
-        
+              CreateMap<CreateOrderDetailDto, OrderDetail>();
+              CreateMap<OrderDetail, OrderDetailDto>().ReverseMap();
+              CreateMap<UpdateOrderDetailDto, OrderDetail>();
+
+                CreateMap<CreatePaymentDto,Payment>();
+              CreateMap<Payment, PaymentDto>().ReverseMap();
+              CreateMap<UpdatePaymentDto, Payment>();
+
+
     }
 }}
