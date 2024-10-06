@@ -6,11 +6,11 @@ using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/api/v1/Address")]
+[Route("/api/v1/address")]
 public class AddressController : ControllerBase
 {
-    private readonly AddressService _addressService;
- public AddressController(AddressService addressService)
+    private readonly IAddressService _addressService;
+ public AddressController(IAddressService addressService)
  {
    _addressService = addressService;
  }
@@ -21,11 +21,11 @@ public class AddressController : ControllerBase
 //? GET => /api/address => Get all the address
 [HttpGet]
 
-  public async Task<IActionResult> GetAllAddress()
+  public async Task<IActionResult> GetAllAddress(QueryParameters queryParameters)
     {
         try
         {
-            var address = await _addressService.GetAllAddressService();
+            var address = await _addressService.GetAllAddressService(queryParameters);
          //   var response=new{Message="return all the address",Address=address};
         return ApiResponse.Success(address,"Return Address is succesfully ");
         }
@@ -111,31 +111,35 @@ public class AddressController : ControllerBase
         }
 }
 [HttpPut("{addressId}")]
-public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] UpdateAddress updateAddress)
+public async Task<IActionResult> UpdateAddress(Guid addressId, [FromBody] UpdateAddress updateAddress)
 {
     try
     {
+        // تحقق من أن الكائن updateAddress ليس فارغًا
         if (updateAddress == null)
         {
-            return ApiResponse.BadRequest("Invalid address data.");}
-
-        var updatedAddress = await _addressService.UpdateAddressService(id, updateAddress);
-        
-        if (updateAddress == null)
-        {
-            return ApiResponse.NotFound("address not found.");
+            return ApiResponse.BadRequest("Invalid address data.");
         }
 
-        //var response = new { Message = "Address updated successfully", Address = updatedAddress };
-        return ApiResponse.Success(updatedAddress,"Address updated successfully");
+        // استخدام id كعنوان فريد
+        var updatedAddress = await _addressService.UpdateAddressService(addressId, updateAddress);
+        
+        // تحقق مما إذا كان تم تحديث العنوان بنجاح
+        if (updatedAddress == null)
+        {
+            return ApiResponse.NotFound("Address not found.");
+        }
+
+        return ApiResponse.Success(updatedAddress, "Address updated successfully");
     }
     catch (ApplicationException ex)
     {
-        return ApiResponse.ServerError("Server Error"+ ex.Message);
+        return ApiResponse.ServerError("Server Error: " + ex.Message);
     }
     catch (Exception ex)
     {
-        return ApiResponse.ServerError("Server Error"+ ex.Message);
-    }}
+        return ApiResponse.ServerError("Server Error: " + ex.Message);
+    }
+}
 
 }

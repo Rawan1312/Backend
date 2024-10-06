@@ -3,17 +3,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
 
+public interface IPaymentService{
+    Task<List<Payment>> GetAllPaymentService();
+    Task<Payment> CreatePaymentService(CreatePaymentDto newpayment);
+    Task<PaymentDto?> GetPaymentByIdService(Guid paymentId);
+    Task<bool> DeletePaymentByIdService(Guid id);
+     Task<Payment> UpdatePaymentService(Guid id, UpdatePaymentDto updatepaymentDto);
+}
+public class PaymentService :IPaymentService 
+{
+    private readonly AppDBContext _appDbContext;
+    private readonly IMapper _mapper;
 
+    public PaymentService(AppDBContext appDbContext, IMapper mapper)
+    {
+        _appDbContext = appDbContext;
+        _mapper = mapper; }
+      public async Task<PaymentDto?> GetPaymentByIdService(Guid PaymentId)
+{
+     try
+    {
+        var payment = await _appDbContext.Payments
+            .FirstOrDefaultAsync(p => p.PaymentId == PaymentId);
 
-public class PaymentService
-  {
-private readonly AppDBContext _appDbContext;
-public PaymentService(AppDBContext appDbContext){
-  _appDbContext=appDbContext;
-}      
+        if (payment == null)
+        {
+            return null; // Return null if user not found
+        }
+          return _mapper.Map<PaymentDto>(payment);
+    }
+    catch (Exception)
+    {
+        throw new ApplicationException("Error occurred while retrieving the user.");
+    }
+}
 
     public async Task<List<Payment>> GetAllPaymentService()
     {
@@ -33,54 +60,17 @@ public PaymentService(AppDBContext appDbContext){
     {
         try
         {
-            var payment = new Payment
-            {
-               PaymentId=newpayment.PaymentId,
-               
-               Amount= newpayment.Amount,
-                PaymentMethods = newpayment.PaymentMethods   
-            };
-
-            await _appDbContext.Payments.AddAsync(payment);
-            await _appDbContext.SaveChangesAsync();
-
-            return payment;
-        }
+           var payment = _mapper.Map<Payment>(newpayment);
+         await _appDbContext.Payments.AddAsync(payment);
+         await _appDbContext.SaveChangesAsync();
+         return payment;
+         
+         }  
         catch (Exception)
         {
             throw new ApplicationException("Error occurred when creating the Payment.");
-        }
-    }
-
-    public async Task<PaymentDto?> GetPaymentByIdService(Guid PaymentId)
-{
-    try
-    {
-        var payment = await _appDbContext.Payments
-            .FirstOrDefaultAsync(p => p.PaymentId == PaymentId);
-
-        if (payment == null)
-        {
-            return null; // Return null if payment  not found
-        }
-
-        // Convert payment to paymentDto if needed
-        var paymentDto = new PaymentDto
-        {
-          PaymentId = payment.PaymentId,
-          Amount = payment.Amount,
-          paymentMethods =payment.PaymentMethods
-            // Map other properties as needed
-        };
-
-        return paymentDto;
-    }
-    catch (Exception)
-    {
-        throw new ApplicationException("Error occurred while retrieving the payment.");
-    }
-}
-   public async Task<bool> DeletePaymentByIdService(Guid id)
+        } }  
+    public async Task<bool> DeletePaymentByIdService(Guid id)
 {
     try
     {
@@ -104,25 +94,21 @@ public PaymentService(AppDBContext appDbContext){
 {
     try
     {
-        var existingorder = await _appDbContext.Payments.FindAsync(id);
+        var existinPayment = await _appDbContext.Payments.FindAsync(id);
 
-        if (existingorder == null)
+        if (existinPayment == null)
         {
-            throw new ApplicationException("Payment not found.");
-        }
+            throw new ApplicationException("Payment not found."); }
+             _mapper.Map(updatepaymentDto, existinPayment);
 
-        existingorder.Amount = updatepaymentDto.Amount;
-        existingorder.PaymentMethods = updatepaymentDto.PaymentMethods ;
-       
-
-        _appDbContext.Payments.Update(existingorder);
+        _appDbContext.Payments.Update(existinPayment);
         await _appDbContext.SaveChangesAsync();
 
-        return existingorder;
+        return existinPayment;
     }
     catch (System.Exception)
     {
         throw new ApplicationException("Error occurred when updating the payment.");
     }
 }
-    }
+}

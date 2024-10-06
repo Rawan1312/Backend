@@ -37,6 +37,7 @@ public UserService(AppDBContext appDbContext,IMapper mapper){
         throw new ApplicationException("erorr ocurred when get the data from the user table");
       }
     }
+
     public async Task<User> CreateUserService(CreateUserDto newuser)
     {
       try

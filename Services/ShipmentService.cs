@@ -10,11 +10,11 @@ using Microsoft.EntityFrameworkCore;
 public interface IShipmentService{
     Task<List<Shipment>> GetAllShipmentService();
     Task<ShipmentDto?> GetShipmentByIdService(Guid Id);
-    Task<bool> DeleteShipmentByIdService(Guid id);
+    Task<bool> DeleteshipmentByIdService(Guid id);
     Task<Shipment> CreateShipmentService(CreateShipment newshipment);
-     Task<Product> UpdateShipmentService(Guid id, UpdateShipment updateShipment);
+     Task<Shipment> UpdateShipmentService(Guid id, UpdateShipment updateShipment);
 }
-public class ShipmentService
+public class ShipmentService:IShipmentService
   {
 private readonly AppDBContext _appDbContext;
  private readonly IMapper _mapper;

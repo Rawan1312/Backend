@@ -5,27 +5,37 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics;
 
-
 var builder = WebApplication.CreateBuilder(args);
+DotNetEnv.Env.Load();
+
+// Get JWT settings from environment variables
+var jwtKey = Environment.GetEnvironmentVariable("Jwt__Key") ?? throw new InvalidOperationException("JWT Key is missing in environment variables.");
+var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer") ?? throw new InvalidOperationException("JWT Issuer is missing in environment variables.");
+var jwtAudience = Environment.GetEnvironmentVariable("Jwt__Audience") ?? throw new InvalidOperationException("JWT Audience is missing in environment variables.");
+
+Console.WriteLine($"----------jwtKey: {jwtKey}---------");
+
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddScoped<CategoryService>();
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<OrderDetailService>();
-builder.Services.AddScoped<PaymentService>();
-builder.Services.AddScoped<OrderService>();
-builder.Services.AddScoped<AddressService>();
-builder.Services.AddScoped<ShipmentService>(); 
+builder.Services.AddScoped<ICategoryService,CategoryService>();
+builder.Services.AddScoped<IProductService,ProductService>();
+builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddScoped<IOrderDetailService,OrderDetailService>();
+builder.Services.AddScoped<IPaymentService,PaymentService>();
+builder.Services.AddScoped<IOrderService,OrderService>();
+builder.Services.AddScoped<IAddressService,AddressService>();
+builder.Services.AddScoped<IShipmentService,ShipmentService>(); 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var defaultConnection = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ?? throw new InvalidOperationException("Default Connection is missing in environment variables.");
+
 builder.Services.AddDbContext<AppDBContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-    
-    builder.Services.AddAuthentication(options =>
+  options.UseNpgsql(defaultConnection));
+
+builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -46,7 +56,6 @@ builder.Services.AddDbContext<AppDBContext>(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
-
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
@@ -76,8 +85,20 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-var app = builder.Build();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins", builder =>
+    {
+        builder.WithOrigins("http://localhost:5173", // Specify the allowed origins
+                            "https://www.yourclientapp.com") // Add additional origins as needed
+              .AllowAnyMethod() // Allows all methods
+              .AllowAnyHeader() // Allows all headers
+              .AllowCredentials(); // Allows credentials like cookies, authorization headers, etc.
+    });
+});
+
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -85,6 +106,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseRouting();
+
+app.UseHttpsRedirection();
+
 app.Use(async (context, next) =>
 {
     var clientIp = context.Connection.RemoteIpAddress?.ToString();
@@ -95,16 +120,17 @@ app.Use(async (context, next) =>
 
     await next.Invoke();
     stopwatch.Stop();
-    Console.WriteLine($"Time Taken: {stopwatch.ElapsedMilliseconds}");
+    Console.WriteLine($"[{DateTime.UtcNow}] [Response]" +
+                      $"Status Code: {context.Response.StatusCode}, " +
+                      $"Time Taken: {stopwatch.ElapsedMilliseconds} ms");
+    Console.WriteLine($"After Calling: {context.Response.StatusCode}");
 });
-
 app.MapGet("/", () =>
 {
     return "hello I am lazy today";
 });
 
-app.UseRouting();
-app.UseHttpsRedirection();
+app.UseCors("AllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

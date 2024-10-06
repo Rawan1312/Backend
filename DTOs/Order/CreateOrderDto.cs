@@ -4,4 +4,5 @@ public class CreateOrderDto
 public required string NameOrder{get;set;}
 
   public required decimal Price{get;set;}
+  public Guid UserId { get; set; }
 }

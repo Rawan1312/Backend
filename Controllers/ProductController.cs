@@ -9,20 +9,20 @@ using Microsoft.AspNetCore.Mvc;
 public class ProductController : ControllerBase
 {
 
-  private readonly ProductService _productService;
+  private readonly IProductService _productService;
 
-  public ProductController(ProductService productService)
+  public ProductController(IProductService productService)
   {
     _productService = productService;
   }
 
   //? GET => /api/products => Get all the products
   [HttpGet]
-  public async Task<IActionResult> GetAllProducts()
+  public async Task<IActionResult> GetAllProducts([FromQuery] QueryParameters queryParameters)
   {
     try
         {
-            var product =await _productService.GetProductsService();
+            var product =await _productService.GetProductsService(queryParameters);
             var response=new{Message="return all the product",Product=product};
         return Ok(response);
         }
@@ -38,18 +38,19 @@ public class ProductController : ControllerBase
   }}
 
   //? GET => /api/products/{id} => Get a single product by Id
-  [HttpGet("{ProductId}")]
-public async Task<IActionResult> GetProductById(Guid ProId)
+  [HttpGet("{productId}")]
+public async Task<IActionResult> GetProductById(Guid productId)
 {
     try
     {
-        var product =await _productService.GetProductByIdService(ProId); 
+        System.Console.WriteLine($"product id {productId}");
+        var product =await _productService.GetProductByIdService(productId); 
 
         if (product == null)
         {
             return ApiResponse.NotFound("product not found" );
         }
-        return ApiResponse.Success(product,"user is retuned succcessfuly");
+        return ApiResponse.Success(product,"product is returned succcessfuly");
     }
     catch (ApplicationException ex)
     {
@@ -86,23 +87,23 @@ public async Task<IActionResult> DeleteProduct(Guid id)
     }}
 
   [HttpPost]
-    public async Task<IActionResult> CreatUsers([FromBody]CreateProductDto newproduct)
+public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto newProduct)
+{
+    try
     {
-        try
-        {
-            var product = await _productService.CreateProductService(newproduct);
-            var response=new{Message="creat the users",Product=product};
-        return ApiResponse.Created(product,"product is created successfully");
-        }
-        catch (ApplicationException ex)
-        {
-            
-             return ApiResponse.ServerError("server error:"+ ex.Message);
-        }
-        catch (System.Exception ex)
-        {
-             return ApiResponse.ServerError("server error:"+ ex.Message);
-        }}
+        var product = await _productService.CreateProductService(newProduct);
+        var response = new { Message = "Product created successfully", Product = product };
+        return ApiResponse.Created(product, response.Message);
+    }
+    catch (ApplicationException ex)
+    {
+        return ApiResponse.ServerError("server error: " + ex.Message);
+    }
+    catch (System.Exception ex)
+    {
+        return ApiResponse.ServerError("server error: " + ex.Message);
+    }
+}
 
 [HttpPut("{id}")]
 public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductDto updateProduct)

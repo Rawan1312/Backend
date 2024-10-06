@@ -12,20 +12,19 @@ using Microsoft.AspNetCore.Mvc;
 [Route("/api/v1/users")]
 public class UserController : ControllerBase
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
     private readonly AuthService _authService;
-    public UserController(UserService userService,AuthService authService)
+    public UserController(IUserService userService,AuthService authService)
     {
          _userService = userService;
         _authService = authService;
     }
         [Authorize(Roles = "Admin")]
-        [HttpGet("profile")]
+         [HttpGet("profile")]
          public IActionResult GetUserProfile()
         {
             return Ok("user data is returned");
         }
-        
 
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()

@@ -53,7 +53,7 @@ public class AuthService {
             var tokenHandler = new JwtSecurityTokenHandler(); // Handler responsible for creating and validating JWTs. It handles the token's lifecycle.
 
             // Convert the secret key from the configuration into a byte array.
-            var jwtKey = _configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is missing in configuration.");
+            var jwtKey =  Environment.GetEnvironmentVariable("Jwt__Key") ?? throw new InvalidOperationException("JWT Key is missing in configuration.");
 
             var key = Encoding.ASCII.GetBytes(jwtKey);
 
@@ -77,8 +77,8 @@ public class AuthService {
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
 
                 // optional
-                Issuer = _configuration["Jwt:Issuer"], // "iss" (issuer) claim: The issuer of the token.
-                Audience = _configuration["Jwt:Audience"] // "aud" (audience) claim: Intended recipient of the token.
+                Issuer = Environment.GetEnvironmentVariable("Jwt__Issuer"), // "iss" (issuer) claim: The issuer of the token.
+                Audience = Environment.GetEnvironmentVariable("Jwt__Audience") // "aud" (audience) claim: Intended recipient of the token.
             };
 
             // Create the token based on the descriptor.

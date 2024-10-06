@@ -6,32 +6,41 @@ using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/api/v1/Category")]
+[Route("/api/v1/category")]
 public class CategoryController : ControllerBase
 {
-  private readonly CategoryService _categoryservice;
-    public CategoryController(CategoryService categoryservice)
+  private readonly ICategoryService _categoryservice;
+    public CategoryController(ICategoryService categoryservice)
     {
         _categoryservice = categoryservice;
     }
 [HttpGet]
-    public async Task<IActionResult> GetAllCategory()
+public async Task<IActionResult> GetAllCategory([FromQuery] QueryParameters queryParameters)
+{
+    try
     {
-        try
+        var category = await _categoryservice.GetAllCategoryService(queryParameters);
+        
+        var response = new
         {
-            var category = await _categoryservice.GetAllCategoryService();
-            var response=new{Message="return all the gategory",Category=category};
-        return Ok(response);
-        }
-        catch (ApplicationException ex)
-        {
-            
-             return ApiResponse.ServerError("server error:"+ ex.Message);
-        }
-        catch (System.Exception ex){
-            
-             return ApiResponse.ServerError("server error:"+ ex.Message);
-        }}
+            Message = "Categories retrieved successfully",
+            TotalCount = category.TotalCount,
+            PageNumber = category.PageNumber,
+            PageSize = category.PageSize,
+            Categories = category.Items
+        };
+
+        return Ok(response); 
+    }
+    catch (ApplicationException ex)
+    {
+        return ApiResponse.ServerError("Server error: " + ex.Message);
+    }
+    catch (System.Exception ex)
+    {
+        return ApiResponse.ServerError("Server error: " + ex.Message);
+    }
+}
 
     [HttpGet("{categoryId}")]
 public async Task<IActionResult> GetCategoryById(Guid categoryId)

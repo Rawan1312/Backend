@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -13,11 +14,13 @@ public interface IOrderService{
     Task<bool> DeleteOrderByIdService(Guid id);
     Task<Order> UpdateOrderService(Guid id, UpdateOrderDto updateOrder);
 }
-public class OrderService
+public class OrderService:IOrderService
   {
 private readonly AppDBContext _appDbContext;
-public OrderService(AppDBContext appDbContext){
+private readonly IMapper _mapper;
+public OrderService(AppDBContext appDbContext,IMapper mapper){
   _appDbContext=appDbContext;
+  _mapper= mapper;
 }      
 
     public async Task<List<Order>> GetAllOrderService()
@@ -30,7 +33,7 @@ public OrderService(AppDBContext appDbContext){
       catch (System.Exception)
       {
         
-        throw new ApplicationException("erorr ocurred when get the data from the user table");
+        throw new ApplicationException("erorr ocurred when get the data from the order table");
       }
     }
       // Create a new order
@@ -38,18 +41,11 @@ public OrderService(AppDBContext appDbContext){
     {
         try
         {
-            var order = new Order
-            {
-                NameOrder = newOrder.NameOrder,
-                Price = newOrder.Price,
-               OrderId=newOrder.OrderId,          
-            };
+            var order = _mapper.Map<Order>(newOrder);
 
             await _appDbContext.Orders.AddAsync(order);
             await _appDbContext.SaveChangesAsync();
-
-            return order;
-        }
+            return order;   }
         catch (Exception)
         {
             throw new ApplicationException("Error occurred when creating the order.");
@@ -65,19 +61,9 @@ public OrderService(AppDBContext appDbContext){
 
         if (order == null)
         {
-            return null; // Return null if user not found
+            return null; // Return null if order not found
         }
-
-        // Convert User to orderDto if needed
-        var orderDto = new OrderDto
-        {
-            OrderId = order.OrderId,
-            NameOrder = order.NameOrder,
-            Price = order.Price,
-            // Map other properties as needed
-        };
-
-        return orderDto;
+        return _mapper.Map<OrderDto>(order);
     }
     catch (Exception)
     {
@@ -100,7 +86,7 @@ public OrderService(AppDBContext appDbContext){
     }
     catch (Exception)
     {
-        throw new ApplicationException("Error occurred while deleting the user.");
+        throw new ApplicationException("Error occurred while deleting the order.");
     }
 }
 
@@ -114,11 +100,8 @@ public OrderService(AppDBContext appDbContext){
         {
             throw new ApplicationException("order not found.");
         }
-
-        existingorder.NameOrder = updateOrder.NameOrder ?? existingorder.NameOrder;
-        existingorder.Price = updateOrder.Price ;
-       
-
+        
+         _mapper.Map(updateOrder, existingorder);
         _appDbContext.Orders.Update(existingorder);
         await _appDbContext.SaveChangesAsync();
 

@@ -3,15 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 
-
-public class OrderDetailService
+public interface IOrderDetailService{
+    Task<List<OrderDetail>> GetAllOrderDetailService();
+    Task<OrderDetail> CreateOrderDetailService(CreateOrderDetailDto newOrderdetail);
+    Task<OrderDetailDto?> GetOrderDetailByIdService(Guid OrderDetailId);
+    Task<bool> DeleteOrderDetailByIdService(Guid id);
+    Task<OrderDetail> UpdateOrderdetailService(Guid id, UpdateOrderDetailDto updateOrderDetailDto);
+}
+public class OrderDetailService:IOrderDetailService
   {
 private readonly AppDBContext _appDbContext;
-public OrderDetailService(AppDBContext appDbContext){
+private readonly IMapper _mapper;
+public OrderDetailService(AppDBContext appDbContext,IMapper mapper){
+    _mapper = mapper;
   _appDbContext=appDbContext;
+
 }      
 
     public async Task<List<OrderDetail>> GetAllOrderDetailService()
@@ -27,22 +37,15 @@ public OrderDetailService(AppDBContext appDbContext){
         throw new ApplicationException("erorr ocurred when get the data from the orderdetail table");
       }
     }
-      // Create a new order
+
     public async Task<OrderDetail> CreateOrderDetailService(CreateOrderDetailDto newOrderdetail)
     {
         try
         {
-            var orderdetail = new OrderDetail
-            {
-               TotalPrice=newOrderdetail.TotalPrice,
-               
-               Quantity= newOrderdetail.Quantity         
-            };
-
-            await _appDbContext.OrderDetails.AddAsync(orderdetail);
-            await _appDbContext.SaveChangesAsync();
-
-            return orderdetail;
+             var orderdetail = _mapper.Map<OrderDetail>(newOrderdetail);
+         
+         await _appDbContext.OrderDetails.AddAsync(orderdetail);
+         await _appDbContext.SaveChangesAsync(); return orderdetail;
         }
         catch (Exception)
         {
@@ -61,19 +64,10 @@ public OrderDetailService(AppDBContext appDbContext){
         {
             return null; // Return null if user not found
         }
-
-        // Convert User to orderdetailDto if needed
-        var orderdetailDto = new OrderDetailDto
-        {
-          OrderDetailId = orderdetail.OrderDetailId,
-          TotalPrice = orderdetail.TotalPrice,
-          Quantity = orderdetail.Quantity,
-            // Map other properties as needed
-        };
-
-        return orderdetailDto;
-    }
-    catch (Exception)
+          return _mapper.Map<OrderDetailDto>(orderdetail);
+       
+        }  
+           catch (Exception)
     {
         throw new ApplicationException("Error occurred while retrieving the orderDetail.");
     }
@@ -109,10 +103,10 @@ public OrderDetailService(AppDBContext appDbContext){
             throw new ApplicationException("orderdetail not found.");
         }
 
-        existingorder.TotalPrice = updateOrderDetailDto.TotalPrice;
-        existingorder.Quantity = updateOrderDetailDto.Quantity ;
+        // existingorder.TotalPrice = updateOrderDetailDto.TotalPrice;
+        // existingorder.Quantity = updateOrderDetailDto.Quantity ;
        
-
+         _mapper.Map(updateOrderDetailDto, existingorder);
         _appDbContext.OrderDetails.Update(existingorder);
         await _appDbContext.SaveChangesAsync();
 

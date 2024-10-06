@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20241002065702_addedit")]
-    partial class addedit
+    [Migration("20241006195555_edit2")]
+    partial class edit2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,7 +40,12 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("AddressId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Address");
                 });
@@ -63,6 +68,9 @@ namespace Backend.Migrations
 
                     b.HasKey("CategoryId");
 
+                    b.HasIndex("CategoryName")
+                        .IsUnique();
+
                     b.ToTable("Category");
                 });
 
@@ -73,9 +81,6 @@ namespace Backend.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("NameOrder")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -84,7 +89,18 @@ namespace Backend.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
+                    b.Property<Guid>("ShipmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("OrderId");
+
+                    b.HasIndex("NameOrder")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -127,7 +143,12 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("PaymentId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Payments");
                 });
@@ -159,6 +180,9 @@ namespace Backend.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Product");
                 });
 
@@ -169,11 +193,22 @@ namespace Backend.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("ShipmentDate")
                         .HasMaxLength(100)
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ShipmentId");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
 
                     b.ToTable("Shipment");
                 });
@@ -192,7 +227,6 @@ namespace Backend.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .IsUnicode(true)
                         .HasColumnType("text");
 
                     b.Property<bool>("IsAdmin")
@@ -212,7 +246,32 @@ namespace Backend.Migrations
 
                     b.HasKey("UserId");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Address", b =>
+                {
+                    b.HasOne("User", "User")
+                        .WithMany("Address")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Order", b =>
+                {
+                    b.HasOne("User", "User")
+                        .WithMany("Order")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OrderDetail", b =>
@@ -220,6 +279,17 @@ namespace Backend.Migrations
                     b.HasOne("Order", null)
                         .WithMany("OrderDetails")
                         .HasForeignKey("OrderId");
+                });
+
+            modelBuilder.Entity("Payment", b =>
+                {
+                    b.HasOne("User", "User")
+                        .WithMany("Payment")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Product", b =>
@@ -233,6 +303,17 @@ namespace Backend.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("Shipment", b =>
+                {
+                    b.HasOne("Order", "Order")
+                        .WithOne("Shipment")
+                        .HasForeignKey("Shipment", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("Category", b =>
                 {
                     b.Navigation("Products");
@@ -241,6 +322,18 @@ namespace Backend.Migrations
             modelBuilder.Entity("Order", b =>
                 {
                     b.Navigation("OrderDetails");
+
+                    b.Navigation("Shipment")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("User", b =>
+                {
+                    b.Navigation("Address");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Payment");
                 });
 #pragma warning restore 612, 618
         }

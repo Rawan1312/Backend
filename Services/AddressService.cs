@@ -7,14 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 public interface IAddressService{
-    Task<List<Address>> GetAllAddressService();
-    Task<AddressDto?> GetAddressByIdService(Guid AddressId);
+     Task<PaginatedResult<AddressDto>> GetAllAddressService(QueryParameters queryParameters);
+    Task<AddressDto?> GetAddresssByIdService(Guid id);
+    Task<Address> CreateAddressService(CreateAddressDto newAddress);
     Task<bool> DeleteAddressByIdService(Guid id);
-    Task<Address> CreateAddressService(CreateAddressDto newaddress);
-    Task<Address> UpdateAddressService(Guid id, AddressDto updateAddressDto);
+    Task<Address> UpdateAddressService(Guid id, UpdateAddress updateAddress);
     }
 
-public class AddressService
+public class AddressService:IAddressService
   {
   private readonly AppDBContext _appDbContext;
 
@@ -23,43 +23,97 @@ public AddressService(AppDBContext appDbContext , IMapper mapper ){
   _appDbContext=appDbContext; 
   _mapper = mapper ; 
 }
-    public async Task<List<AddressDto>> GetAllAddressService() {
-      try{
-        var address= await _appDbContext.Address.Include(u => u.User).ToListAsync();
-      var addressDtos = _mapper.Map<List<AddressDto>>(address);
-        return addressDtos;
-      }
-       catch (System.Exception)
-      {
-        
-        throw new ApplicationException("erorr ocurred when get the data from the address table");
-      }}
-    public async Task<AddressDto?> GetAddresssByIdService(Guid id)
+   public async Task<PaginatedResult<AddressDto>> GetAllAddressService(QueryParameters queryParameters)
+{
+    try
     {
-      try{
-         var address = _mapper.Map<AddressDto?>(id);
-       await _appDbContext.Address 
+        // البدء بإنشاء استعلام قابل للتصفية
+        var query = _appDbContext.Address.Include(u => u.User).AsQueryable();
+
+        // 1. البحث (Search)
+        if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
+        {
+            query = query.Where(a => a.City.Contains(queryParameters.SearchTerm) || a.State.Contains(queryParameters.SearchTerm));
+        }
+
+        // 2. الترتيب (Sorting)
+        if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        {
+            switch (queryParameters.SortBy.ToLower())
+            {
+                case "city":
+                    query = queryParameters.SortOrder.ToLower() == "asc"
+                        ? query.OrderBy(a => a.City)
+                        : query.OrderByDescending(a => a.City);
+                    break;
+                case "state":
+                    query = queryParameters.SortOrder.ToLower() == "asc"
+                        ? query.OrderBy(a => a.State)
+                        : query.OrderByDescending(a => a.State);
+                    break;
+                default:
+                    query = query.OrderBy(a => a.City); // الترتيب الافتراضي بالمدينة
+                    break;
+            }
+        }
+
+        // 3. إجمالي عدد النتائج قبل تطبيق التقسيم إلى صفحات
+        var totalCount = await query.CountAsync();
+
+        // 4. التقسيم إلى صفحات (Pagination)
+        var items = await query
+            .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)  // تجاوز النتائج السابقة حسب الصفحة
+            .Take(queryParameters.PageSize)  // جلب عدد النتائج المطلوبة
+            .ToListAsync();
+
+        // 5. تحويل النتائج إلى AddressDto
+        var addressDtos = items.Select(a => new AddressDto
+        {
+            AddressId = a.AddressId,
+            City = a.City,
+            State = a.State,
+            User = new UserDto
+            {
+                UserId = a.User.UserId,
+                Name = a.User.Name,
+                Email = a.User.Email
+            }
+        }).ToList();
+
+        // 6. إرجاع النتائج مع معلومات البيجينيشن
+        return new PaginatedResult<AddressDto>
+        {
+            Items = addressDtos,
+            TotalCount = totalCount,
+            PageNumber = queryParameters.PageNumber,
+            PageSize = queryParameters.PageSize
+        };
+    }
+    catch (System.Exception)
+    {
+        throw new ApplicationException("Error occurred when getting data from the address table");
+    }
+}
+
+    public async Task<AddressDto?> GetAddresssByIdService(Guid id)
+{
+    try
+    {
+        var addressEntity = await _appDbContext.Address
             .FirstOrDefaultAsync(d => d.AddressId == id);
 
-        if (address == null)
+        if (addressEntity == null)
         {
             return null; 
         }
-        
-        // var addressDto = new AddressDto   // Make sure
-        // {
-        //     AddressId = address.AddressId,
-        //     City = address.City,
-        //     State = address.State,
-        //     // Map other properties as needed
-        // };_mapper.Map<Address>(newAddress);
 
-        return _mapper.Map<AddressDto?>(address); // make sure
+        return _mapper.Map<AddressDto>(addressEntity); // تحويل العنوان إلى DTO
     }
     catch (Exception)
     {
         throw new ApplicationException("Error occurred while retrieving the address.");
-    }}
+    }
+}
     public async Task<Address> CreateAddressService(CreateAddressDto newAddress)
     {
       // Make sure AddressDto newAddress & Task<Address> I think CreateAddressDto newAddress
