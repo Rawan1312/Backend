@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics;
 
-
 var builder = WebApplication.CreateBuilder(args);
 DotNetEnv.Env.Load();
 
@@ -15,6 +14,7 @@ var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer") ?? throw new I
 var jwtAudience = Environment.GetEnvironmentVariable("Jwt__Audience") ?? throw new InvalidOperationException("JWT Audience is missing in environment variables.");
 
 Console.WriteLine($"----------jwtKey: {jwtKey}---------");
+
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<CategoryService>();
@@ -35,7 +35,7 @@ var defaultConnection = Environment.GetEnvironmentVariable("ConnectionStrings__D
 builder.Services.AddDbContext<AppDBContext>(options =>
   options.UseNpgsql(defaultConnection));
 
-    builder.Services.AddAuthentication(options =>
+builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -56,8 +56,6 @@ builder.Services.AddDbContext<AppDBContext>(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
-
-
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
@@ -88,6 +86,19 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// نقل إعدادات CORS إلى هنا قبل بناء التطبيق
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins", builder =>
+    {
+        builder.WithOrigins("http://localhost:5173", // Specify the allowed origins
+                            "https://www.yourclientapp.com") // Add additional origins as needed
+              .AllowAnyMethod() // Allows all methods
+              .AllowAnyHeader() // Allows all headers
+              .AllowCredentials(); // Allows credentials like cookies, authorization headers, etc.
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -96,14 +107,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-
-app.MapGet("/", () =>
-{
-    return "hello I am lazy today";
-});
-
-
 app.UseRouting();
 
 app.UseHttpsRedirection();
@@ -119,32 +122,17 @@ app.Use(async (context, next) =>
     await next.Invoke();
     stopwatch.Stop();
     Console.WriteLine($"[{DateTime.UtcNow}] [Response]" +
-                            $"Status Code: {context.Response.StatusCode}, " +
-                            $"Time Taken: {stopwatch.ElapsedMilliseconds} ms");
-          Console.WriteLine($"After Calling: {context.Response.StatusCode}");
+                      $"Status Code: {context.Response.StatusCode}, " +
+                      $"Time Taken: {stopwatch.ElapsedMilliseconds} ms");
+    Console.WriteLine($"After Calling: {context.Response.StatusCode}");
+});
+app.MapGet("/", () =>
+{
+    return "hello I am lazy today";
 });
 
-
-builder.Services.AddCors(options =>
-    {
-
-      // you can create multiple policies to use specifically for each controller
-        options.AddPolicy("AllowSpecificOrigins", builder =>
-        {
-            builder.WithOrigins("http://localhost:5173", // Specify the allowed origins
-                                "https://www.yourclientapp.com" // Add additional origins as needed
-                                // "*") // This accept request from all origins => not recommended
-                    )
-                  .AllowAnyMethod() // Allows all methods
-                  // .WithMethods("GET, POST") // Allows only specific methods
-                  .AllowAnyHeader() // Allows all headers
-                  // .WithHeaders("Content-Type", "Authorization") // Allow Specific Headers
-                  .AllowCredentials(); // Allows credentials like cookies, authorization headers, etc.
-        });
-    });
-
-    
-app.UseCors("MyAllowSpecificOrigins");
+// استخدم السياسة المعرفة باسمها الصحيح
+app.UseCors("AllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
