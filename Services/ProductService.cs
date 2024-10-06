@@ -15,6 +15,7 @@ public interface IProductService{
     
     
 } 
+
 public class ProductService:IProductService
 {
     private readonly AppDBContext _appDbContext;
@@ -82,12 +83,13 @@ public ProductService(AppDBContext appDbContext,IMapper mapper){
         throw new ApplicationException("Error occurred when getting data from the product table");
     }
 }
-public async Task<ProductDto?> GetProductByIdService(Guid Id)
+public async Task<ProductDto> GetProductByIdService(Guid Id)
 {
+    Console.WriteLine($"befor add {Id}");
+    
     try
     {
-        var product = await _appDbContext.Product
-            .FirstOrDefaultAsync(u => u.Id == Id);
+        var product = await _appDbContext.Product.FindAsync(Id);
 
         if (product == null)
         {
@@ -96,14 +98,14 @@ public async Task<ProductDto?> GetProductByIdService(Guid Id)
 
         // Convert product to productDto if needed
         return _mapper.Map<ProductDto>(product);
-
-        
+     
     }
     catch (Exception)
     {
         throw new ApplicationException("Error occurred while retrieving the product.");
     }
 }
+
 
 public async Task<bool> DeleteProductByIdService(Guid id)
 {
@@ -125,21 +127,33 @@ public async Task<bool> DeleteProductByIdService(Guid id)
     }
 }
 
-public async Task<Product> CreateProductService(CreateProductDto newproduct)
+public async Task<Product> CreateProductService(CreateProductDto newProductDto)
+{
+    try
     {
-      try
-      {
-        var product = _mapper.Map<Product>(newproduct);
-         await _appDbContext.Product.AddAsync(product);
-         await _appDbContext.SaveChangesAsync();
-         return product;
-      }
-      catch (System.Exception)
-      {
+        var existingCategory = await _appDbContext.Category
+            .FirstOrDefaultAsync(c => c.CategoryId == newProductDto.CategoryId);
+
+        if (existingCategory == null)
+        {
+            throw new ApplicationException("Category not found.");
+        }
+
+        var product = _mapper.Map<Product>(newProductDto);
         
-        throw new ApplicationException("erorr ocurred when creat the  product ");
-      }
+        product.CategoryId = existingCategory.CategoryId;
+
+        await _appDbContext.Product.AddAsync(product);
+        await _appDbContext.SaveChangesAsync();
+
+        return product;
     }
+    catch (Exception ex)
+    {
+        throw new ApplicationException($"An error occurred while creating the product: {ex.Message}");
+    }
+}
+
    public async Task<Product> UpdateProductService(Guid id, UpdateProductDto updateProduct)
 {
     try

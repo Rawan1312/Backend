@@ -24,19 +24,24 @@ namespace ecommerce_db_api.Mappers
             CreateMap<Category, CategoryDto>().ReverseMap();
 
 
-        CreateMap<ProductDto,Product >();
+        CreateMap<Product,ProductDto>();
          CreateMap<UpdateProductDto, Product>();
         CreateMap<CreateProductDto, Product>();
 
 
                       //Address Maps
-            CreateMap<CreateAddressDto, Address>();
+            CreateMap<CreateAddressDto, Address>().ReverseMap();
             CreateMap<Address, AddressDto>().ReverseMap(); //?? GeyByID
             CreateMap<UpdateAddress, Address>();
+                 
                    //Shipment Maps
              CreateMap<CreateShipment, Shipment>();
               CreateMap<Shipment, ShipmentDto>();//??GeyByID
               CreateMap<UpdateShipment, Shipment>();
+
+              CreateMap<CreateOrderDto, Order>();
+              CreateMap<Order, OrderDto>().ReverseMap();
+              CreateMap<UpdateOrderDto, Order>();
 
         
     }

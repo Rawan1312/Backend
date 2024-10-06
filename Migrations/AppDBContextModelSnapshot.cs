@@ -78,9 +78,6 @@ namespace Backend.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("NameOrder")
                         .IsRequired()
                         .HasMaxLength(200)

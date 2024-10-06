@@ -20,12 +20,11 @@ public class UserController : ControllerBase
         _authService = authService;
     }
         [Authorize(Roles = "Admin")]
-        [HttpGet("profile")]
+         [HttpGet("profile")]
          public IActionResult GetUserProfile()
         {
             return Ok("user data is returned");
         }
-        
 
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()

@@ -35,31 +35,24 @@ public AddressService(AppDBContext appDbContext , IMapper mapper ){
         throw new ApplicationException("erorr ocurred when get the data from the address table");
       }}
     public async Task<AddressDto?> GetAddresssByIdService(Guid id)
+{
+    try
     {
-      try{
-         var address = _mapper.Map<AddressDto?>(id);
-       await _appDbContext.Address 
+        var addressEntity = await _appDbContext.Address
             .FirstOrDefaultAsync(d => d.AddressId == id);
 
-        if (address == null)
+        if (addressEntity == null)
         {
             return null; 
         }
-        
-        // var addressDto = new AddressDto   // Make sure
-        // {
-        //     AddressId = address.AddressId,
-        //     City = address.City,
-        //     State = address.State,
-        //     // Map other properties as needed
-        // };_mapper.Map<Address>(newAddress);
 
-        return _mapper.Map<AddressDto?>(address); // make sure
+        return _mapper.Map<AddressDto>(addressEntity); // تحويل العنوان إلى DTO
     }
     catch (Exception)
     {
         throw new ApplicationException("Error occurred while retrieving the address.");
-    }}
+    }
+}
     public async Task<Address> CreateAddressService(CreateAddressDto newAddress)
     {
       // Make sure AddressDto newAddress & Task<Address> I think CreateAddressDto newAddress

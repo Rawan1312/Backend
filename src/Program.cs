@@ -7,6 +7,14 @@ using System.Diagnostics;
 
 
 var builder = WebApplication.CreateBuilder(args);
+DotNetEnv.Env.Load();
+
+// Get JWT settings from environment variables
+var jwtKey = Environment.GetEnvironmentVariable("Jwt__Key") ?? throw new InvalidOperationException("JWT Key is missing in environment variables.");
+var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer") ?? throw new InvalidOperationException("JWT Issuer is missing in environment variables.");
+var jwtAudience = Environment.GetEnvironmentVariable("Jwt__Audience") ?? throw new InvalidOperationException("JWT Audience is missing in environment variables.");
+
+Console.WriteLine($"----------jwtKey: {jwtKey}---------");
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<CategoryService>();
@@ -22,9 +30,11 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var defaultConnection = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ?? throw new InvalidOperationException("Default Connection is missing in environment variables.");
+
 builder.Services.AddDbContext<AppDBContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-    
+  options.UseNpgsql(defaultConnection));
+
     builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -46,6 +56,7 @@ builder.Services.AddDbContext<AppDBContext>(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
+
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -76,8 +87,8 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-var app = builder.Build();
 
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -85,6 +96,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+app.MapGet("/", () =>
+{
+    return "hello I am lazy today";
+});
+
+
+app.UseRouting();
+
+app.UseHttpsRedirection();
+
 app.Use(async (context, next) =>
 {
     var clientIp = context.Connection.RemoteIpAddress?.ToString();
@@ -95,16 +118,33 @@ app.Use(async (context, next) =>
 
     await next.Invoke();
     stopwatch.Stop();
-    Console.WriteLine($"Time Taken: {stopwatch.ElapsedMilliseconds}");
+    Console.WriteLine($"[{DateTime.UtcNow}] [Response]" +
+                            $"Status Code: {context.Response.StatusCode}, " +
+                            $"Time Taken: {stopwatch.ElapsedMilliseconds} ms");
+          Console.WriteLine($"After Calling: {context.Response.StatusCode}");
 });
 
-app.MapGet("/", () =>
-{
-    return "hello I am lazy today";
-});
 
-app.UseRouting();
-app.UseHttpsRedirection();
+builder.Services.AddCors(options =>
+    {
+
+      // you can create multiple policies to use specifically for each controller
+        options.AddPolicy("AllowSpecificOrigins", builder =>
+        {
+            builder.WithOrigins("http://localhost:5173", // Specify the allowed origins
+                                "https://www.yourclientapp.com" // Add additional origins as needed
+                                // "*") // This accept request from all origins => not recommended
+                    )
+                  .AllowAnyMethod() // Allows all methods
+                  // .WithMethods("GET, POST") // Allows only specific methods
+                  .AllowAnyHeader() // Allows all headers
+                  // .WithHeaders("Content-Type", "Authorization") // Allow Specific Headers
+                  .AllowCredentials(); // Allows credentials like cookies, authorization headers, etc.
+        });
+    });
+
+    
+app.UseCors("MyAllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

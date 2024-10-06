@@ -15,23 +15,32 @@ public class CategoryController : ControllerBase
         _categoryservice = categoryservice;
     }
 [HttpGet]
-    public async Task<IActionResult> GetAllCategory()
+public async Task<IActionResult> GetAllCategory([FromQuery] QueryParameters queryParameters)
+{
+    try
     {
-        try
+        var category = await _categoryservice.GetAllCategoryService(queryParameters);
+        
+        var response = new
         {
-            var category = await _categoryservice.GetAllCategoryService();
-            var response=new{Message="return all the gategory",Category=category};
-        return Ok(response);
-        }
-        catch (ApplicationException ex)
-        {
-            
-             return ApiResponse.ServerError("server error:"+ ex.Message);
-        }
-        catch (System.Exception ex){
-            
-             return ApiResponse.ServerError("server error:"+ ex.Message);
-        }}
+            Message = "Categories retrieved successfully",
+            TotalCount = category.TotalCount,
+            PageNumber = category.PageNumber,
+            PageSize = category.PageSize,
+            Categories = category.Items
+        };
+
+        return Ok(response); 
+    }
+    catch (ApplicationException ex)
+    {
+        return ApiResponse.ServerError("Server error: " + ex.Message);
+    }
+    catch (System.Exception ex)
+    {
+        return ApiResponse.ServerError("Server error: " + ex.Message);
+    }
+}
 
     [HttpGet("{categoryId}")]
 public async Task<IActionResult> GetCategoryById(Guid categoryId)

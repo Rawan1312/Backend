@@ -73,12 +73,14 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
           // entity.HasMany(e=>e.OrderDetails).WithOne();
           entity.Property(e=>e.Price);
           });
+
           modelBuilder.Entity<OrderDetail>(entity=>{
           entity.HasKey(e=>e.OrderDetailId);
           entity.Property(e=>e.OrderDetailId).HasDefaultValueSql("uuid_generate_v4()");
           entity.Property(e=>e.TotalPrice).IsRequired().HasMaxLength(200);
           entity.Property(e=>e.Quantity);
             });
+            
           modelBuilder.Entity<Payment>(entity=>{
           entity.HasKey(e=>e.PaymentId);
           entity.Property(e=>e.PaymentId).HasDefaultValueSql("uuid_generate_v4()");
