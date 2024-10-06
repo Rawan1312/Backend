@@ -27,11 +27,11 @@ public class UserController : ControllerBase
         }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllUsers(QueryParameters queryParameters)
+    public async Task<IActionResult> GetAllUsers()
     {
         try
         {
-            var users = await _userService.GetAllUsersService(queryParameters);
+            var users = await _userService.GetAllUsersService();
             var response=new{Message="return all the users",Users=users};
         return Ok(response);
         }
