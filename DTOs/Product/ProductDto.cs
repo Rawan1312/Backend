@@ -9,5 +9,6 @@ public record ProductDto
     public required Guid Id { get; set; }
     public required string Name { get; set; }
     public required decimal Price { get; set; }
+    public required string CategoryName { get; set; }
     
 }

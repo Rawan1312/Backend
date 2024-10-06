@@ -9,29 +9,10 @@ public interface ICategoryService{
     Task<CategoryDto?> GetCategoryByIdService(Guid categoryId);
     Task<bool> DeleteCategoryByIdService(Guid id);
     Task<Category> CreateCategoryService(CreateCategoryDto newcategory);
-    Task<Category> UpdateCategoryService(Guid id, CategoryDto UpdateCategoryDto);
+    Task<Category> UpdateCategoryService(Guid id, UpdateCategoryDto UpdateCategoryDto);
     }
-public class QueryParameters
-{
-    public int PageNumber { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
-    public string SearchTerm { get; set; } = string.Empty;
-    public string SortBy { get; set; } = "Name"; // Default sorting by name
-    public string SortOrder { get; set; } = "asc"; // asc or desc
-}
-    public class PaginatedResult<T>
-{
-    // = new List<Item>();تاكدي بعدين هل يوضع لها ؟ او 
-    public List<T>? Items { get; set; }
-    public int TotalCount { get; set; }
-    public int PageNumber { get; set; }
-    public int PageSize { get; set; }
-        public string? SearchBy { get; set; }
-}
 
-
-
-public class CategoryService
+public class CategoryService:ICategoryService
   {
     private readonly AppDBContext _appDbContext;
     private readonly IMapper _mapper;
@@ -43,7 +24,6 @@ public CategoryService(AppDBContext appDbContext,IMapper mapper){
 {
     try
     {
-        // إنشاء Query لبدء الفلترة والبحث
         var query = _appDbContext.Category.AsQueryable();
 
         // 1. البحث (Search)

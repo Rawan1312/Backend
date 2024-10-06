@@ -6,11 +6,11 @@ using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/api/v1/Category")]
+[Route("/api/v1/category")]
 public class CategoryController : ControllerBase
 {
-  private readonly CategoryService _categoryservice;
-    public CategoryController(CategoryService categoryservice)
+  private readonly ICategoryService _categoryservice;
+    public CategoryController(ICategoryService categoryservice)
     {
         _categoryservice = categoryservice;
     }

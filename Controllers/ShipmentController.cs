@@ -15,8 +15,8 @@ public class ShipmentController : ControllerBase
 //     }
 
 {
-     private readonly ShipmentService _shipmentService;
-    public ShipmentController(ShipmentService shipmentService)
+     private readonly IShipmentService _shipmentService;
+    public ShipmentController(IShipmentService shipmentService)
     {
         _shipmentService = shipmentService;
     }

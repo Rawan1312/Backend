@@ -9,20 +9,20 @@ using Microsoft.AspNetCore.Mvc;
 public class ProductController : ControllerBase
 {
 
-  private readonly ProductService _productService;
+  private readonly IProductService _productService;
 
-  public ProductController(ProductService productService)
+  public ProductController(IProductService productService)
   {
     _productService = productService;
   }
 
   //? GET => /api/products => Get all the products
   [HttpGet]
-  public async Task<IActionResult> GetAllProducts()
+  public async Task<IActionResult> GetAllProducts([FromQuery] QueryParameters queryParameters)
   {
     try
         {
-            var product =await _productService.GetProductsService();
+            var product =await _productService.GetProductsService(queryParameters);
             var response=new{Message="return all the product",Product=product};
         return Ok(response);
         }

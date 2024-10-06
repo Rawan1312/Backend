@@ -17,14 +17,14 @@ Console.WriteLine($"----------jwtKey: {jwtKey}---------");
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddScoped<CategoryService>();
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<OrderDetailService>();
-builder.Services.AddScoped<PaymentService>();
-builder.Services.AddScoped<OrderService>();
-builder.Services.AddScoped<AddressService>();
-builder.Services.AddScoped<ShipmentService>(); 
+builder.Services.AddScoped<ICategoryService,CategoryService>();
+builder.Services.AddScoped<IProductService,ProductService>();
+builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddScoped<IOrderDetailService,OrderDetailService>();
+builder.Services.AddScoped<IPaymentService,PaymentService>();
+builder.Services.AddScoped<IOrderService,OrderService>();
+builder.Services.AddScoped<IAddressService,AddressService>();
+builder.Services.AddScoped<IShipmentService,ShipmentService>(); 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();
@@ -86,7 +86,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// نقل إعدادات CORS إلى هنا قبل بناء التطبيق
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", builder =>
@@ -131,7 +130,6 @@ app.MapGet("/", () =>
     return "hello I am lazy today";
 });
 
-// استخدم السياسة المعرفة باسمها الصحيح
 app.UseCors("AllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();

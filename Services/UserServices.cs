@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 
 public interface IUserService{
-    Task<List<User>> GetAllUsersService();
+    Task<PaginatedResult<User>> GetAllUsersService(QueryParameters queryParameters);
     Task<User> CreateUserService(CreateUserDto newuser);
     Task<UserDto?> GetUserByIdService(Guid userId);
     Task<bool> DeleteUserByIdService(Guid id);
@@ -24,19 +24,64 @@ public UserService(AppDBContext appDbContext,IMapper mapper){
   _appDbContext=appDbContext;
 }     
 
-    public async Task<List<User>> GetAllUsersService()
+    public async Task<PaginatedResult<User>> GetAllUsersService(QueryParameters queryParameters)
+{
+    try
     {
-      try
-      {
-        var user= await _appDbContext.Users.ToListAsync();
-      return user;
-      }
-      catch (System.Exception)
-      {
-        
-        throw new ApplicationException("erorr ocurred when get the data from the user table");
-      }
+        // 1. إنشاء استعلام قابل للتصفية
+        var query = _appDbContext.Users.AsQueryable();
+
+        // 2. البحث (Search) - إذا كنت ترغب في إضافة ميزة البحث
+        if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
+        {
+            query = query.Where(u => u.Name.Contains(queryParameters.SearchTerm) || u.Email.Contains(queryParameters.SearchTerm));
+        }
+
+        // 3. الترتيب (Sorting) - إذا كنت ترغب في إضافة ميزة الترتيب
+        if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        {
+            switch (queryParameters.SortBy.ToLower())
+            {
+                case "Name":
+                    query = queryParameters.SortOrder.ToLower() == "asc"
+                        ? query.OrderBy(u => u.Name)
+                        : query.OrderByDescending(u => u.Name);
+                    break;
+                case "Email":
+                    query = queryParameters.SortOrder.ToLower() == "asc"
+                        ? query.OrderBy(u => u.Email)
+                        : query.OrderByDescending(u => u.Email);
+                    break;
+                default:
+                    query = query.OrderBy(u => u.Name); // الترتيب الافتراضي بالاسم
+                    break;
+            }
+        }
+
+        // 4. إجمالي عدد النتائج قبل تطبيق البيجينيشن
+        var totalCount = await query.CountAsync();
+
+        // 5. البيجينيشن (Pagination)
+        var users = await query
+            .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize) // تجاوز النتائج السابقة حسب الصفحة
+            .Take(queryParameters.PageSize) // جلب عدد النتائج المطلوبة
+            .ToListAsync();
+
+        // 6. إرجاع النتائج مع معلومات البيجينيشن
+        return new PaginatedResult<User>
+        {
+            Items = users,
+            TotalCount = totalCount,
+            PageNumber = queryParameters.PageNumber,
+            PageSize = queryParameters.PageSize
+        };
     }
+    catch (System.Exception)
+    {
+        throw new ApplicationException("Error occurred when getting data from the user table");
+    }
+}
+
     public async Task<User> CreateUserService(CreateUserDto newuser)
     {
       try

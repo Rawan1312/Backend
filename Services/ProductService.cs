@@ -7,14 +7,15 @@ using Microsoft.EntityFrameworkCore;
 
 
 public interface IProductService{
-    Task<List<ProductDto>> GetProductsService();
-    Task<ProductDto?> GetProductByIdService(Guid Id);
+    Task<PaginatedResult<ProductDto>> GetProductsService(QueryParameters queryParameters);
+    Task<ProductDto> GetProductByIdService(Guid Id);
     Task<bool> DeleteProductByIdService(Guid id);
-    Task<Product> CreateProductService(CreateProductDto newproduct);
+    Task<Product> CreateProductService(CreateProductDto newProductDto);
      Task<Product> UpdateProductService(Guid id, UpdateProductDto updateProduct);
     
     
 } 
+
 
 public class ProductService:IProductService
 {
@@ -24,59 +25,67 @@ public ProductService(AppDBContext appDbContext,IMapper mapper){
     _mapper = mapper;
   _appDbContext=appDbContext;
 }     
-    
-//     public class PaginatedResult<T>
-// {
-//     // = new List<Item>();تاكدي بعدين هل يوضع لها ؟ او 
-//     public List<T>? Items { get; set; }
-//     public int TotalCount { get; set; }
-//     public int PageNumber { get; set; }
-//     public int PageSize { get; set; }
-//         public string? SearchBy { get; set; }
 
-//         public async Task<PaginatedResult<ProductDto>> GetProductsService(int pageNumber, int pageSize, string? searchBy = null)
-//     {
-//         var products = await _appDbContext.Products.ToListAsync();
-
-//         var filteredProducts = products.Where(p =>
-//             string.IsNullOrEmpty(searchBy) || p.Name.Contains(searchBy, StringComparison.OrdinalIgnoreCase));
-
-//         var totalFilteredProducts = filteredProducts.Count();
-
-   
-//     var paginatedProducts = filteredProducts.Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(product => new ProductDto
-//         {
-//             Id = product.Id,
-//             Name = product.Name,
-//             Price = product.Price
-//         }).ToList();
-
-   
-//     var paginatedResult = new PaginatedResult<ProductDto>
-//         {
-//             PageSize = pageSize,
-//             PageNumber = pageNumber,
-//             SearchBy = searchBy,
-//             TotalCount = totalFilteredProducts,
-//             Items = paginatedProducts
-//         };
-
-//     return paginatedResult;}}
-
-    public async Task<List<ProductDto>> GetProductsService()
+    public async Task<PaginatedResult<ProductDto>> GetProductsService(QueryParameters queryParameters)
 {
     try
     {
-        var products = await _appDbContext.Product.Include(c => c.Category).ToListAsync();
-        
-        var productDtos = products.Select(p => new ProductDto
+        // 1. الاستعلام الأساسي على المنتجات وربطها مع الفئات
+        var query = _appDbContext.Product.Include(p => p.Category).AsQueryable();
+
+        // 2. البحث (Search)
+        if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
         {
-            Id = p.Id, 
+            query = query.Where(p => p.Name.Contains(queryParameters.SearchTerm));
+        }
+
+        // 3. الترتيب (Sorting)
+        if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        {
+            switch (queryParameters.SortBy.ToLower())
+            {
+                case "name":
+                    query = queryParameters.SortOrder.ToLower() == "asc"
+                        ? query.OrderBy(p => p.Name)
+                        : query.OrderByDescending(p => p.Name);
+                    break;
+                case "price":
+                    query = queryParameters.SortOrder.ToLower() == "asc"
+                        ? query.OrderBy(p => p.Price)
+                        : query.OrderByDescending(p => p.Price);
+                    break;
+                default:
+                    query = query.OrderBy(p => p.Name); // الترتيب الافتراضي بالاسم
+                    break;
+            }
+        }
+
+        // 4. إجمالي عدد المنتجات قبل البيجنيشن
+        var totalCount = await query.CountAsync();
+
+        // 5. تطبيق البيجنيشن: تخطي النتائج السابقة وجلب النتائج المطلوبة فقط
+        var items = await query
+            .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)  // تخطي النتائج السابقة حسب رقم الصفحة
+            .Take(queryParameters.PageSize)  // جلب عدد النتائج المحددة في الصفحة
+            .ToListAsync();
+
+        // 6. تحويل المنتجات إلى ProductDto
+        var productDtos = items.Select(p => new ProductDto
+        {
+            Id = p.Id,
             Name = p.Name,
             Price = p.Price,
+            CategoryName = p.Category.CategoryName // إضافة اسم الفئة لكل منتج
         }).ToList();
 
-        return productDtos;
+        // 7. إرجاع النتيجة مع معلومات البيجنيشن
+        return new PaginatedResult<ProductDto>
+        {
+            Items = productDtos,
+            TotalCount = totalCount,
+            PageNumber = queryParameters.PageNumber,
+            PageSize = queryParameters.PageSize
+        };
     }
     catch (System.Exception)
     {

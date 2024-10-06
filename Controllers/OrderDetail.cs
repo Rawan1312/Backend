@@ -2,138 +2,143 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/api/v1/orderDetail")]
+[Route("/api/v1/orderdetails")]
 public class OrderDetailController : ControllerBase
 {
-    private readonly OrderDetailService _orderdetailService;
+    private readonly IOrderDetailService _orderdetailService;
 
-    public OrderDetailController(OrderDetailService orderdetailService)
+    public OrderDetailController(IOrderDetailService orderdetailService)
     {
         _orderdetailService = orderdetailService;
     }
 
-    // Get all orders
+    //POST => /api/orderDetails => Create an orderDetail
+    [HttpPost]
+    public async Task<IActionResult> CreateOrderDetailDto([FromBody] CreateOrderDetailDto newOrderDetail)
+    {
+        if(!ModelState.IsValid)
+     {   
+          var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            return BadRequest(new { Message = "Validation failed", Errors = errors });
+        //    return ApiResponse.BadRequest("Invalid orderdetail Data");
+    }
+        try
+        {
+            var createdOrderDetail = await _orderdetailService.CreateOrderDetailService(newOrderDetail);
+            return ApiResponse.Created("orderdetail is created successfuly");
+        }
+        catch (ApplicationException ex)
+        {
+           return ApiResponse.ServerError("server error:"+ ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse.ServerError("server error:"+ ex.Message);;
+        }
+    }
+    // Get => /api/payments => RETURN all payment
     [HttpGet]
     public async Task<IActionResult> GetAllOrderDetail()
     {
         try
         {
-            var orderdetails = await _orderdetailService.GetAllOrderDetailService();
-            var response = new { Message = "Return all ordersDetail", OrderDetails = orderdetails };
-            return Ok(response);
+            var orderdetail = await _orderdetailService.GetAllOrderDetailService();
+           if(orderdetail == null)
+            {
+            return ApiResponse.NotFound("orderDetail not found");
+            }
+         return ApiResponse.Success(orderdetail, "orderdetail are returned succesfully");
         }
         catch (ApplicationException ex)
         {
-            return StatusCode(500, ex.Message);
+           return ApiResponse.ServerError("server error:"+ ex.Message);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+           return ApiResponse.ServerError("server error:"+ ex.Message);
         }
     }
 
-    // Get order by ID
-    [HttpGet("{OrderDetailId}")]
-    public async Task<IActionResult> GetOrderDetailById(Guid OrderDetailId)
+     //GET => /api/paymetns/{OrderDetailId} => return a single payment
+    [HttpGet("{orderdetailId}")]
+    public async Task<IActionResult> GetOrderDetailById(Guid orderdetailId)
     {
         try
         {
-            var orderdetail = await _orderdetailService.GetOrderDetailByIdService(OrderDetailId);
+            var orderdetail = await _orderdetailService.GetOrderDetailByIdService(orderdetailId);
             
             if (orderdetail == null)
             {
-                return NotFound(new { Message = "OrderDetail not found" });
+                return ApiResponse.NotFound( "orderdetail not found" );;
             }
             
-            return Ok(orderdetail);
+            return ApiResponse.Success(orderdetail,"orderdetail is retuned succcessfuly");
         }
         catch (ApplicationException ex)
         {
-            return StatusCode(500, ex.Message);
+            return ApiResponse.ServerError("server error:"+ ex.Message);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+           return ApiResponse.ServerError("server error:"+ ex.Message);
         }
     }
 
-    // Delete order by ID
-    [HttpDelete("{Id}")]
-    public async Task<IActionResult> DeleteOrderDetail(Guid Id)
+    // DELETE => /api/orderDetails/{orderdetailId} => delete a single orderdetail
+    [HttpDelete("{orderdetailId}")]
+    public async Task<IActionResult> DeleteOrderDetail(Guid orderdetailId)
     {
         try
         {
-            var result = await _orderdetailService.DeleteOrderDetailByIdService(Id);
-            if (result)
-            {
-                return Ok(new { Message = "OrderDetail deleted successfully" });
+            var result = await _orderdetailService.DeleteOrderDetailByIdService(orderdetailId);
+            if (result == false)
+            {   return ApiResponse.NotFound($"orderdetail with this id {orderdetailId}dose not exist" );
             }
             else
             {
-                return NotFound(new { Message = "OrderDetail not found" });
+                 return ApiResponse.Success(result,"orderdetail is deleted successfuly");
             }
         }
         catch (ApplicationException ex)
         {
-            return StatusCode(500, ex.Message);
+            return ApiResponse.ServerError("server error:"+ ex.Message);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+            return ApiResponse.ServerError("server error:"+ ex.Message);
         }
     }
 
-    // Create a new order
-    [HttpPost]
-    public async Task<IActionResult> CreateOrderDetailDto([FromBody] CreateOrderDetailDto newOrderDetail)
+    // PUT => /api/orderdetails/{orderdetailId} => Update an payment
+    [HttpPut("{orderdetailId}")]
+    public async Task<IActionResult> UpdateOrderDetailService(Guid orderdetailId, [FromBody] UpdateOrderDetailDto updateOrderDetail)
     {
         try
         {
-            var createdOrderDetail = await _orderdetailService.CreateOrderDetailService(newOrderDetail);
-            var response = new { Message = "OrderDetail created successfully", OrderDetail = createdOrderDetail };
-            return Created($"/api/v1/orderdetail/{createdOrderDetail.OrderDetailId}", response);
-        }
-        catch (ApplicationException ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-    }
-
-    // Update an existing order
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateOrderDetailService(Guid id, [FromBody] UpdateOrderDetailDto updateOrderDetail)
-    {
-        try
-        {
-            if (updateOrderDetail == null)
+            if (!ModelState.IsValid)
             {
                 return BadRequest("Invalid orderdetail data.");
             }
 
-            var updatedOrderdetail = await _orderdetailService.UpdateOrderdetailService(id, updateOrderDetail);
+            var updatedOrderdetail = await _orderdetailService.UpdateOrderdetailService(orderdetailId, updateOrderDetail);
             
             if (updatedOrderdetail == null)
             {
-                return NotFound(new { Message = "OrderDetail not found" });
+                return ApiResponse.NotFound("orderdetail not found.");
             }
-
-            var response = new { Message = "OrderDetail updated successfully", OrderDetail = updatedOrderdetail };
-            return Ok(response);
+             return ApiResponse.Success(updatedOrderdetail,"orderdetail is updated successfuly");
         }
         catch (ApplicationException ex)
         {
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+           return ApiResponse.ServerError("server error:"+ ex.Message);
         }
     }
 }

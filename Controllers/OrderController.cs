@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 [Route("/api/v1/orders")]
 public class OrderController : ControllerBase
 {
-    private readonly OrderService _orderService;
-    public OrderController(OrderService orderService)
+    private readonly IOrderService _orderService;
+    public OrderController(IOrderService orderService)
     {
         _orderService = orderService;
     }

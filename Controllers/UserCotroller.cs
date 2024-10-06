@@ -12,9 +12,9 @@ using Microsoft.AspNetCore.Mvc;
 [Route("/api/v1/users")]
 public class UserController : ControllerBase
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
     private readonly AuthService _authService;
-    public UserController(UserService userService,AuthService authService)
+    public UserController(IUserService userService,AuthService authService)
     {
          _userService = userService;
         _authService = authService;
@@ -27,11 +27,11 @@ public class UserController : ControllerBase
         }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllUsers()
+    public async Task<IActionResult> GetAllUsers(QueryParameters queryParameters)
     {
         try
         {
-            var users = await _userService.GetAllUsersService();
+            var users = await _userService.GetAllUsersService(queryParameters);
             var response=new{Message="return all the users",Users=users};
         return Ok(response);
         }

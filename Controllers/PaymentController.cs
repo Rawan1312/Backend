@@ -2,138 +2,144 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ecommerce_db_api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("/api/v1/Payment")]
+[Route("/api/v1/Payments")]
 public class PaymentController : ControllerBase
 {
-    private readonly PaymentService _PaymentServicee;
+    private readonly IPaymentService _PaymentServicee;
 
-    public PaymentController(PaymentService PaymentServicee)
+    public PaymentController(IPaymentService PaymentServicee)
     {
         _PaymentServicee = PaymentServicee;
     }
 
-    // Get all orders
+     //POST => /api/payments => Create an payment
+     [HttpPost]
+    public async Task<IActionResult> CreatePaymentDto([FromBody] CreatePaymentDto newpayment)
+    {if(!ModelState.IsValid)
+     {   
+          var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            return BadRequest(new { Message = "Validation failed", Errors = errors });
+        //    return ApiResponse.BadRequest("Invalid payment Data");
+    }
+        try
+        {
+            var CreatePayment = await _PaymentServicee.CreatePaymentService(newpayment);
+           return ApiResponse.Created("payment is created successfuly");
+        }
+        catch (ApplicationException ex)
+        {
+            return ApiResponse.ServerError("server error:"+ ex.Message);
+        }
+        catch (Exception ex)
+        {
+             return ApiResponse.ServerError("server error:"+ ex.Message);
+        }
+    }
+
+    // Get => /api/payments => RETURN all payment
     [HttpGet]
     public async Task<IActionResult> GetAllPayment()
     {
         try
         {
             var payments = await _PaymentServicee.GetAllPaymentService();
-            var response = new { Message = "Return all Payment", Payments = payments };
-            return Ok(response);
+            if(payments == null)
+            {
+            return ApiResponse.NotFound("payment not found");
+            }
+         return ApiResponse.Success(payments, "payment are returned succesfully");
         }
         catch (ApplicationException ex)
         {
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+            return ApiResponse.ServerError("server error:"+ ex.Message);
         }
     }
 
-    // Get payment by ID
-    [HttpGet("{PaymentId}")]
-    public async Task<IActionResult> GetPaymentById(Guid PaymentId)
+    //GET => /api/paymetns/{paymentId} => return a single payment
+    [HttpGet("{paymentId}")]
+    public async Task<IActionResult> GetPaymentById(Guid paymentId)
     {
         try
         {
-            var payments= await _PaymentServicee.GetPaymentByIdService(PaymentId);
+            var payments= await _PaymentServicee.GetPaymentByIdService(paymentId);
             
             if (payments == null)
             {
-                return NotFound(new { Message = "Payment not found" });
+                 return ApiResponse.NotFound($"payment with this id {paymentId} does not exist" );
             }
             
-            return Ok(payments);
+            return ApiResponse.Success(payments,"payment is retuned succcessfuly");
         }
         catch (ApplicationException ex)
         {
-            return StatusCode(500, ex.Message);
+            return ApiResponse.ServerError("server error:"+ ex.Message);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }
     }
 
-    // Delete payment by ID
-    [HttpDelete("{Id}")]
-    public async Task<IActionResult> DeletePayment(Guid Id)
+    
+ // DELETE => /api/payments/{paymentId} => delete a single payment
+    [HttpDelete("{paymentId}")]
+    public async Task<IActionResult> DeletePayment(Guid paymentId)
     {
         try
         {
-            var result = await _PaymentServicee.DeletePaymentByIdService(Id);
-            if (result)
+            var result = await _PaymentServicee.DeletePaymentByIdService(paymentId);
+            if (result == false)
             {
-                return Ok(new { Message = "Payment deleted successfully" });
+              return ApiResponse.NotFound($"payment with this id {paymentId}dose not exist" );
             }
             else
             {
-                return NotFound(new { Message = "Payment not found" });
+               return ApiResponse.Success(result,"payment is deleted successfuly");
             }
         }
         catch (ApplicationException ex)
         {
-            return StatusCode(500, ex.Message);
+             return ApiResponse.ServerError("server error:"+ ex.Message);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+          return ApiResponse.ServerError("server error:"+ ex.Message);
         }
     }
 
-    // Create a new payment
-    [HttpPost]
-    public async Task<IActionResult> CreatePaymentDto([FromBody] CreatePaymentDto newpayment)
-    {
-        try
-        {
-            var CreatePaymentDto = await _PaymentServicee.CreatePaymentService(newpayment);
-            var response = new { Message = "payment created successfully", newpayment = CreatePaymentDto };
-            return Created($"/api/v1/payment/{CreatePaymentDto.PaymentId}", response);
-        }
-        catch (ApplicationException ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-    }
 
-    // Update an existing payment
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePaymentSerivce(Guid id, [FromBody] UpdatePaymentDto updatePayment)
+    // PUT => /api/payments/{paymentId} => Update an payment
+    [HttpPut("{paymentId}")]
+    public async Task<IActionResult> UpdatePaymentSerivce(Guid paymentId, [FromBody] UpdatePaymentDto updatePayment)
     {
-        try
-        {
-            if (updatePayment == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Invalid payment data.");
+              return ApiResponse.BadRequest("Invalid payment data.");
             }
-
-            var updatPayments = await _PaymentServicee.UpdatePaymentService(id, updatePayment);
-            
+           try
+           {
+            var updatPayments = await _PaymentServicee.UpdatePaymentService(paymentId, updatePayment);
             if (updatPayments == null)
             {
-                return NotFound(new { Message = "payment not found" });
+                return ApiResponse.NotFound("payment not found.");
             }
-
-            var response = new { Message = "payment updated successfully", Payment = updatPayments };
-            return Ok(response);
-        }
+           return ApiResponse.Success(updatPayments,"payment is updated successfuly");}
         catch (ApplicationException ex)
         {
-            return StatusCode(500, ex.Message);
+            return ApiResponse.ServerError("server error:"+ ex.Message);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+           return ApiResponse.ServerError("server error:"+ ex.Message);
         }
-    }
-}
+    
+        
+}}
