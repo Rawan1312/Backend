@@ -21,7 +21,7 @@ public class AddressController : ControllerBase
 //? GET => /api/address => Get all the address
 [HttpGet]
 
-  public async Task<IActionResult> GetAllAddress(QueryParameters queryParameters)
+  public async Task<IActionResult> GetAllAddress([FromQuery]QueryParameters queryParameters)
     {
         try
         {
