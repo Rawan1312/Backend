@@ -27,16 +27,13 @@ public AddressService(AppDBContext appDbContext , IMapper mapper ){
 {
     try
     {
-        // البدء بإنشاء استعلام قابل للتصفية
         var query = _appDbContext.Address.Include(u => u.User).AsQueryable();
 
-        // 1. البحث (Search)
         if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
         {
             query = query.Where(a => a.City.Contains(queryParameters.SearchTerm) || a.State.Contains(queryParameters.SearchTerm));
         }
 
-        // 2. الترتيب (Sorting)
         if (!string.IsNullOrEmpty(queryParameters.SortBy))
         {
             switch (queryParameters.SortBy.ToLower())
@@ -52,21 +49,19 @@ public AddressService(AppDBContext appDbContext , IMapper mapper ){
                         : query.OrderByDescending(a => a.State);
                     break;
                 default:
-                    query = query.OrderBy(a => a.City); // الترتيب الافتراضي بالمدينة
+                    query = query.OrderBy(a => a.City); 
                     break;
             }
         }
 
-        // 3. إجمالي عدد النتائج قبل تطبيق التقسيم إلى صفحات
         var totalCount = await query.CountAsync();
 
-        // 4. التقسيم إلى صفحات (Pagination)
         var items = await query
-            .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)  // تجاوز النتائج السابقة حسب الصفحة
-            .Take(queryParameters.PageSize)  // جلب عدد النتائج المطلوبة
+            .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)  
+            .Take(queryParameters.PageSize)  
             .ToListAsync();
 
-        // 5. تحويل النتائج إلى AddressDto
+        
         var addressDtos = items.Select(a => new AddressDto
         {
             AddressId = a.AddressId,
@@ -80,7 +75,6 @@ public AddressService(AppDBContext appDbContext , IMapper mapper ){
             }
         }).ToList();
 
-        // 6. إرجاع النتائج مع معلومات البيجينيشن
         return new PaginatedResult<AddressDto>
         {
             Items = addressDtos,
