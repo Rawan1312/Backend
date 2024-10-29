@@ -168,7 +168,7 @@ DotNetEnv.Env.Load();
 var jwtKey = Environment.GetEnvironmentVariable("Jwt__Key") ?? throw new InvalidOperationException("JWT Key is missing in environment variables.");
 var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer") ?? throw new InvalidOperationException("JWT Issuer is missing in environment variables.");
 var jwtAudience = Environment.GetEnvironmentVariable("Jwt__Audience") ?? throw new InvalidOperationException("JWT Audience is missing in environment variables.");
-var connectionDb = Environment.GetEnvironmentVariable("DataBase__Connection") ?? throw new InvalidOperationException("Database connection string is missing in environment variables.");
+var connectionDb = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ?? throw new InvalidOperationException("Database connection string is missing in environment variables.");
 
 System.Console.WriteLine($"Connection DB {connectionDb}");
 
