@@ -7,5 +7,9 @@ public class  Product
   public DateTime CreatedAt { get; set; }
   public Guid CategoryId { get; set; }
   public Category Category{ get; set; }
+  public string Description {get;set;}
+  public string Genre {get;set;}
+  public decimal PublicationYear {get;set;}
+
 
 }

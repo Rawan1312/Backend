@@ -8,6 +8,17 @@ using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins", builder =>
+    {
+        builder.WithOrigins("  http://localhost:5173/") // Specify the allowed origins
+              .AllowAnyMethod() // Allows all methods
+              .AllowAnyHeader() // Allows all headers
+              .AllowCredentials(); // Allows credentials like cookies, authorization headers, etc.
+    });
+});
 // Load environment variables from .env file
 DotNetEnv.Env.Load();
 
@@ -73,17 +84,7 @@ builder.Services.AddSwaggerGen(c =>
 // Add AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
 
-// CORS configuration
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigins", builder =>
-    {
-        builder.WithOrigins("http://localhost:5125", "https://www.yourclientapp.com") // Specify the allowed origins
-              .AllowAnyMethod() // Allows all methods
-              .AllowAnyHeader() // Allows all headers
-              .AllowCredentials(); // Allows credentials like cookies, authorization headers, etc.
-    });
-});
+
 
 // JWT Authentication
 var key = Encoding.ASCII.GetBytes(jwtKey);
