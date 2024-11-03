@@ -54,8 +54,8 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
         .IsRequired(); 
         entity.Property(e => e.Author) 
         .IsRequired(); 
-    entity.Property(e => e.PublicationYear).IsRequired(); 
-       
+    entity.Property(e => e.PublicationYear) 
+        .HasColumnType("decimal(4, 0)");
 
           });
           modelBuilder.Entity<Category>()
