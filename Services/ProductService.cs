@@ -75,7 +75,12 @@ public ProductService(AppDBContext appDbContext,IMapper mapper){
             Id = p.Id,
             Name = p.Name,
             Price = p.Price,
-            CategoryName = p.Category.CategoryName // إضافة اسم الفئة لكل منتج
+            CategoryName = p.Category.CategoryName,
+             Description = p.Description,
+             Author = p.Author,
+             Genre = p.Genre,
+             PublicationYear = p.PublicationYear
+
         }).ToList();
 
         // 7. إرجاع النتيجة مع معلومات البيجنيشن

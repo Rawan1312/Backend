@@ -10,6 +10,8 @@ public class UpdateProductDto
   [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero.")]
   public decimal? Price { get; set; }
     public required string Description {get;set;}
+    
+  public required string Author{get;set;}
   public  required string Genre {get;set;}
   public decimal PublicationYear {get;set;}
 }
