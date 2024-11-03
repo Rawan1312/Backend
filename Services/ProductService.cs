@@ -25,21 +25,17 @@ public ProductService(AppDBContext appDbContext,IMapper mapper){
     _mapper = mapper;
   _appDbContext=appDbContext;
 }     
-
-    public async Task<PaginatedResult<ProductDto>> GetProductsService(QueryParameters queryParameters)
+public async Task<PaginatedResult<ProductDto>> GetProductsService(QueryParameters queryParameters)
 {
     try
     {
-        // 1. الاستعلام الأساسي على المنتجات وربطها مع الفئات
         var query = _appDbContext.Product.Include(p => p.Category).AsQueryable();
 
-        // 2. البحث (Search)
         if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
         {
             query = query.Where(p => p.Name.Contains(queryParameters.SearchTerm));
         }
 
-        // 3. الترتيب (Sorting)
         if (!string.IsNullOrEmpty(queryParameters.SortBy))
         {
             switch (queryParameters.SortBy.ToLower())
@@ -55,35 +51,29 @@ public ProductService(AppDBContext appDbContext,IMapper mapper){
                         : query.OrderByDescending(p => p.Price);
                     break;
                 default:
-                    query = query.OrderBy(p => p.Name); // الترتيب الافتراضي بالاسم
+                    query = query.OrderBy(p => p.Name);
                     break;
             }
         }
 
-        // 4. إجمالي عدد المنتجات قبل البيجنيشن
         var totalCount = await query.CountAsync();
-
-        // 5. تطبيق البيجنيشن: تخطي النتائج السابقة وجلب النتائج المطلوبة فقط
         var items = await query
-            .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)  // تخطي النتائج السابقة حسب رقم الصفحة
-            .Take(queryParameters.PageSize)  // جلب عدد النتائج المحددة في الصفحة
+            .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)
+            .Take(queryParameters.PageSize)
             .ToListAsync();
 
-        // 6. تحويل المنتجات إلى ProductDto
         var productDtos = items.Select(p => new ProductDto
         {
             Id = p.Id,
             Name = p.Name,
             Price = p.Price,
             CategoryName = p.Category.CategoryName,
-             Description = p.Description,
-             Author = p.Author,
-             Genre = p.Genre,
-             PublicationYear = p.PublicationYear
-
+            Description = p.Description,
+            Author = p.Author,
+            Genre = p.Genre,
+            PublicationYear = p.PublicationYear
         }).ToList();
 
-        // 7. إرجاع النتيجة مع معلومات البيجنيشن
         return new PaginatedResult<ProductDto>
         {
             Items = productDtos,
@@ -92,11 +82,85 @@ public ProductService(AppDBContext appDbContext,IMapper mapper){
             PageSize = queryParameters.PageSize
         };
     }
-    catch (System.Exception)
+    catch (Exception ex)
     {
-        throw new ApplicationException("Error occurred when getting data from the product table");
+        Console.WriteLine($"Error occurred when getting data from the product table:{ex.Message}"); // تسجيل الخطأ
+        throw new ApplicationException("Error occurred when getting data from the product table", ex);
     }
 }
+
+
+//     public async Task<PaginatedResult<ProductDto>> GetProductsService(QueryParameters queryParameters)
+// {
+//     try
+//     {
+//         // 1. الاستعلام الأساسي على المنتجات وربطها مع الفئات
+//         var query = _appDbContext.Product.Include(p => p.Category).AsQueryable();
+
+//         // 2. البحث (Search)
+//         if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
+//         {
+//             query = query.Where(p => p.Name.Contains(queryParameters.SearchTerm));
+//         }
+
+//         // 3. الترتيب (Sorting)
+//         if (!string.IsNullOrEmpty(queryParameters.SortBy))
+//         {
+//             switch (queryParameters.SortBy.ToLower())
+//             {
+//                 case "name":
+//                     query = queryParameters.SortOrder.ToLower() == "asc"
+//                         ? query.OrderBy(p => p.Name)
+//                         : query.OrderByDescending(p => p.Name);
+//                     break;
+//                 case "price":
+//                     query = queryParameters.SortOrder.ToLower() == "asc"
+//                         ? query.OrderBy(p => p.Price)
+//                         : query.OrderByDescending(p => p.Price);
+//                     break;
+//                 default:
+//                     query = query.OrderBy(p => p.Name); // الترتيب الافتراضي بالاسم
+//                     break;
+//             }
+//         }
+
+//         // 4. إجمالي عدد المنتجات قبل البيجنيشن
+//         var totalCount = await query.CountAsync();
+
+//         // 5. تطبيق البيجنيشن: تخطي النتائج السابقة وجلب النتائج المطلوبة فقط
+//         var items = await query
+//             .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)  // تخطي النتائج السابقة حسب رقم الصفحة
+//             .Take(queryParameters.PageSize)  // جلب عدد النتائج المحددة في الصفحة
+//             .ToListAsync();
+
+//         // 6. تحويل المنتجات إلى ProductDto
+//         var productDtos = items.Select(p => new ProductDto
+//         {
+//             Id = p.Id,
+//             Name = p.Name,
+//             Price = p.Price,
+//             CategoryName = p.Category.CategoryName,
+//              Description = p.Description,
+//              Author = p.Author,
+//              Genre = p.Genre,
+//              PublicationYear = p.PublicationYear
+
+//         }).ToList();
+
+//         // 7. إرجاع النتيجة مع معلومات البيجنيشن
+//         return new PaginatedResult<ProductDto>
+//         {
+//             Items = productDtos,
+//             TotalCount = totalCount,
+//             PageNumber = queryParameters.PageNumber,
+//             PageSize = queryParameters.PageSize
+//         };
+//     }
+//     catch (System.Exception)
+//     {
+//         throw new ApplicationException("Error occurred when getting data from the product table");
+//     }
+// }
 public async Task<ProductDto> GetProductByIdService(Guid Id)
 {
     Console.WriteLine($"befor add {Id}");
