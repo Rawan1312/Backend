@@ -72,7 +72,7 @@ public async Task<PaginatedResult<ProductDto>> GetProductsService(QueryParameter
             Author = p.Author,
             Genre = p.Genre,
             PublicationYear = p.PublicationYear,
-            ImageUrl = p.ImageUrl
+            // ImageUrl = p.ImageUrl
         }).ToList();
 
         return new PaginatedResult<ProductDto>

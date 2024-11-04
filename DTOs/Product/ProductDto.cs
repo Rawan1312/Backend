@@ -15,7 +15,7 @@ public record ProductDto
   public required string Author{get;set;}
   public  required string Genre {get;set;}
   public decimal PublicationYear {get;set;}
-   public required string ImageUrl {get;set;}
+  //  public required string ImageUrl {get;set;}
 
     
 }
