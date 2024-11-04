@@ -72,7 +72,7 @@ public async Task<PaginatedResult<ProductDto>> GetProductsService(QueryParameter
             Author = p.Author,
             Genre = p.Genre,
             PublicationYear = p.PublicationYear,
-            ImageUrl = p.ImageUrl,
+            ImageUrl = p.ImageUrl
         }).ToList();
 
         return new PaginatedResult<ProductDto>
@@ -80,7 +80,11 @@ public async Task<PaginatedResult<ProductDto>> GetProductsService(QueryParameter
             Items = productDtos,
             TotalCount = totalCount,
             PageNumber = queryParameters.PageNumber,
-            PageSize = queryParameters.PageSize
+            PageSize = queryParameters.PageSize,
+            SearchBy = queryParameters.SearchTerm,  
+            SortBy = queryParameters.SortBy 
+
+            
         };
     }
     catch (Exception ex)

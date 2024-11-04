@@ -31,5 +31,7 @@ public class PaginatedResult<T>
     public int PageNumber { get; set; }
     public int PageSize { get; set; }
     public string? SearchBy { get; set; }
+    public string ? SortBy {get;set;}
+    public string? SortOrder{get;set;}
     public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
 }
