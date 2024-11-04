@@ -48,14 +48,11 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
           entity.HasIndex(e => e.Name).IsUnique();
           entity.Property(e=>e.Price).IsRequired();
           entity.Property(e=>e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-           entity.Property(e => e.Description) 
-        .IsRequired(); 
-    entity.Property(e => e.Genre) 
-        .IsRequired(); 
-        entity.Property(e => e.Author) 
-        .IsRequired(); 
-    entity.Property(e => e.PublicationYear) 
-        .HasColumnType("decimal(4, 0)");
+          entity.Property(e => e.Description)  .IsRequired(); 
+          entity.Property(e => e.Genre).IsRequired(); 
+          entity.Property(e => e.Author).IsRequired(); 
+          entity.Property(e => e.ImageUrl).IsRequired(); 
+          entity.Property(e => e.PublicationYear).HasColumnType("decimal(4, 0)");
 
           });
           modelBuilder.Entity<Category>()
