@@ -32,28 +32,32 @@ public async Task<PaginatedResult<ProductDto>> GetProductsService(QueryParameter
         var query = _appDbContext.Product.Include(p => p.Category).AsQueryable();
 
         if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
-        {
-            query = query.Where(p => p.Name.Contains(queryParameters.SearchTerm));
-        }
+        // {
+        //     query = query.Where(p => p.Name.Contains(queryParameters.SearchTerm));
+        // }
 
-        if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        // if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        // {
+        //     switch (queryParameters.SortBy.ToLower())
+        //     {
+        //         case "name":
+        //             query = queryParameters.SortOrder.ToLower() == "asc"
+        //                 ? query.OrderBy(p => p.Name)
+        //                 : query.OrderByDescending(p => p.Name);
+        //             break;
+        //         case "price":
+        //             query = queryParameters.SortOrder.ToLower() == "asc"
+        //                 ? query.OrderBy(p => p.Price)
+        //                 : query.OrderByDescending(p => p.Price);
+        //             break;
+        //         default:
+        //             query = query.OrderBy(p => p.Name);
+        //             break;
+        //     }
+        // }
+        if (string.IsNullOrEmpty(queryParameters.SortOrder))
         {
-            switch (queryParameters.SortBy.ToLower())
-            {
-                case "name":
-                    query = queryParameters.SortOrder.ToLower() == "asc"
-                        ? query.OrderBy(p => p.Name)
-                        : query.OrderByDescending(p => p.Name);
-                    break;
-                case "price":
-                    query = queryParameters.SortOrder.ToLower() == "asc"
-                        ? query.OrderBy(p => p.Price)
-                        : query.OrderByDescending(p => p.Price);
-                    break;
-                default:
-                    query = query.OrderBy(p => p.Name);
-                    break;
-            }
+            queryParameters.SortOrder = "asc"; // تعيين قيمة افتراضية
         }
 
         var totalCount = await query.CountAsync();
