@@ -36,25 +36,46 @@ public async Task<PaginatedResult<ProductDto>> GetProductsService(QueryParameter
             query = query.Where(p => p.Name.Contains(queryParameters.SearchTerm));
         }
 
-        if (!string.IsNullOrEmpty(queryParameters.SortBy))
-        {
-            switch (queryParameters.SortBy.ToLower())
-            {
-                case "name":
-                    query = queryParameters.SortOrder.ToLower() == "asc"
-                        ? query.OrderBy(p => p.Name)
-                        : query.OrderByDescending(p => p.Name);
-                    break;
-                case "price":
-                    query = queryParameters.SortOrder.ToLower() == "asc"
-                        ? query.OrderBy(p => p.Price)
-                        : query.OrderByDescending(p => p.Price);
-                    break;
-                default:
-                    query = query.OrderBy(p => p.Name);
-                    break;
-            }
-        }
+        // if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        // {
+        //     switch (queryParameters.SortBy.ToLower())
+        //     {
+        //         case "name":
+        //             query = queryParameters.SortOrder.ToLower() == "asc"
+        //                 ? query.OrderBy(p => p.Name)
+        //                 : query.OrderByDescending(p => p.Name);
+        //             break;
+        //         case "price":
+        //             query = queryParameters.SortOrder.ToLower() == "asc"
+        //                 ? query.OrderBy(p => p.Price)
+        //                 : query.OrderByDescending(p => p.Price);
+        //             break;
+        //         default:
+        //             query = query.OrderBy(p => p.Name);
+        //             break;
+        //     }
+        // }
+if (!string.IsNullOrEmpty(queryParameters.SortBy))
+{
+    switch (queryParameters.SortBy.ToLower())
+    {
+        case "name":
+            if (queryParameters.SortOrder?.ToLower() == "asc")
+                query = query.OrderBy(p => p.Name);
+            else
+                query = query.OrderByDescending(p => p.Name);
+            break;
+        case "price":
+            if (queryParameters.SortOrder?.ToLower() == "asc")
+                query = query.OrderBy(p => p.Price);
+            else
+                query = query.OrderByDescending(p => p.Price);
+            break;
+        default:
+            query = query.OrderBy(p => p.Name); // Default sorting
+            break;
+    }
+}
 
         var totalCount = await query.CountAsync();
         var items = await query
