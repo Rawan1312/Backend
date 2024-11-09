@@ -54,25 +54,27 @@ public async Task<PaginatedResult<ProductDto>> GetProductsService(QueryParameter
         //             query = query.OrderBy(p => p.Name);
         //             break;
         //     }
-        // }
-if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        // }if (!string.IsNullOrEmpty(queryParameters.SortBy))
 {
     switch (queryParameters.SortBy.ToLower())
     {
         case "name":
-            if (queryParameters.SortOrder?.ToLower() == "asc")
-                query = query.OrderBy(p => p.Name);
-            else
-                query = query.OrderByDescending(p => p.Name);
+            query = queryParameters.SortOrder?.ToLower() == "asc" 
+                ? query.OrderBy(p => p.Name) 
+                : query.OrderByDescending(p => p.Name);
             break;
         case "price":
-            if (queryParameters.SortOrder?.ToLower() == "asc")
-                query = query.OrderBy(p => p.Price);
-            else
-                query = query.OrderByDescending(p => p.Price);
+            query = queryParameters.SortOrder?.ToLower() == "asc" 
+                ? query.OrderBy(p => p.Price) 
+                : query.OrderByDescending(p => p.Price);
             break;
+        // case "date":
+        //     query = queryParameters.SortOrder?.ToLower() == "asc" 
+        //         ? query.OrderBy(p => p.Der) 
+        //         : query.OrderByDescending(p => p.Date);
+        //     break;
         default:
-            query = query.OrderBy(p => p.Name); // Default sorting
+            query = query.OrderBy(p => p.Name); // Default sorting by name
             break;
     }
 }
