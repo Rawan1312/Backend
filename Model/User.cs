@@ -6,8 +6,8 @@ public class User
         public required string Name { get; set; } = string.Empty;
         public required string Email { get; set; }
         public required string Password { get; set; }
-        public bool IsAdmin { get; set; } = true;
-        public bool IsBanned { get; set; } = false;
+        public bool IsAdmin { get; set; } = false;
+        public bool IsBanned { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
          public List<Order> Order =new List<Order>();
          public List<Payment> Payment =new List<Payment>();
