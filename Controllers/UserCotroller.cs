@@ -56,7 +56,7 @@ public async Task<IActionResult> GetUserById(Guid userId)
             // cheng her
             return ApiResponse.NotFound( "User not found" );
         }
-        return ApiResponse.Success("user is retuned succcessfuly");
+        return ApiResponse.Success(user,"user is retuned succcessfuly");
     }
     catch (ApplicationException ex)
     {
