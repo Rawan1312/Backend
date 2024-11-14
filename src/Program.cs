@@ -14,7 +14,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", builder =>
     {
-        builder.WithOrigins("http://localhost:5173") // Remove leading space
+        builder.WithOrigins("http://localhost:5173","https://graceful-wisp-d1ace5.netlify.app") // Remove leading space
               .AllowAnyMethod() // Allows all methods
               .AllowAnyHeader() // Allows all headers
               .AllowCredentials(); // Allows credentials like cookies, authorization headers, etc.
