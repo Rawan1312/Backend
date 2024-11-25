@@ -14,7 +14,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", builder =>
     {
-        builder.WithOrigins("https://fullstack-ecommerce-luno-rawan.netlify.app","https://novelland-projects.netlify.app/","http://localhost:5173") // Remove leading space
+        builder.WithOrigins("https://novelland-projects.netlify.app/","http://localhost:5173") // Remove leading space
               .AllowAnyMethod() // Allows all methods
               .AllowAnyHeader() // Allows all headers
               .AllowCredentials(); // Allows credentials like cookies, authorization headers, etc.
@@ -149,3 +149,7 @@ app.UseSwaggerUI(c =>
 app.MapControllers();
 
 app.Run();
+
+
+
+//"https://fullstack-ecommerce-luno-rawan.netlify.app"
